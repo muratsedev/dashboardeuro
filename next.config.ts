@@ -3,7 +3,7 @@ import path from "path";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  // For Firebase Hosting - disable static export due to client components with dynamic routes
+  // Configure for Netlify server-side deployment (supports API routes)
   images: {
     remotePatterns: [
       // Development configuration
