@@ -45,11 +45,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Firebase
-.firebase/
-.firebaserc
-firebase-debug.log*
-
 # Build artifacts
 dist/
 *.log
