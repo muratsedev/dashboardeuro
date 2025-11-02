@@ -26,14 +26,7 @@ export default function Articles() {
   const fetchArticles = async () => {
     try {
       setIsLoading(true);
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065';
       console.log('Fetching articles from API...');
-      console.log('API URL:', apiUrl);
-      
-      // Check if using localhost in production
-      if (apiUrl.includes('localhost') && typeof window !== 'undefined') {
-        throw new Error('⚠️ Environment variable NEXT_PUBLIC_API_URL is not set in Vercel! Using localhost fallback which will not work in production.');
-      }
       
       const data = await getArticles();
       console.log('Articles data received:', data);
@@ -80,14 +73,39 @@ export default function Articles() {
 
   if (isLoading) return <div>Loading...</div>;
   if (error) {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065';
+    // Smart detection of API URL
+    const getActualApiUrl = () => {
+      if (process.env.NEXT_PUBLIC_API_URL) {
+        return process.env.NEXT_PUBLIC_API_URL;
+      }
+      if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+        return 'https://eennback-002-site1.atempurl.com';
+      }
+      return 'https://localhost:7065';
+    };
+    
+    const apiUrl = getActualApiUrl();
     const isLocalhostError = apiUrl.includes('localhost');
+    const isEnvVarMissing = !process.env.NEXT_PUBLIC_API_URL && typeof window !== 'undefined' && window.location.hostname !== 'localhost';
     
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4 p-4">
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-2xl">
           <h3 className="text-lg font-semibold text-red-800 mb-2">خطأ في الاتصال</h3>
           <p className="text-red-600 mb-4">فشل في الاتصال بالخادم</p>
+          
+          {isEnvVarMissing && (
+            <div className="bg-blue-100 border border-blue-300 rounded p-4 mb-4 text-right">
+              <h4 className="font-bold text-blue-900 mb-2">ℹ️ ملاحظة</h4>
+              <p className="text-sm text-blue-800 mb-2">
+                المتغير <code className="bg-blue-200 px-1 rounded">NEXT_PUBLIC_API_URL</code> غير معرف في Vercel.
+                نستخدم الآن الرابط الافتراضي للإنتاج.
+              </p>
+              <p className="text-sm text-blue-800">
+                للحصول على أفضل أداء، يُنصح بإضافة المتغير في إعدادات Vercel.
+              </p>
+            </div>
+          )}
           
           {isLocalhostError && (
             <div className="bg-yellow-100 border border-yellow-300 rounded p-4 mb-4 text-right">

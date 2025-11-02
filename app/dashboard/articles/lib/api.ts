@@ -55,16 +55,24 @@ api.interceptors.response.use(
 const getBaseApiUrl = () => {
   // If environment variable is set, use it
   if (process.env.NEXT_PUBLIC_API_URL) {
+    console.log('✅ Using NEXT_PUBLIC_API_URL from environment:', process.env.NEXT_PUBLIC_API_URL);
     return process.env.NEXT_PUBLIC_API_URL;
   }
   
-  // If in production (deployed), use the production API
-  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-    console.warn('⚠️ NEXT_PUBLIC_API_URL not set, using production fallback');
-    return 'https://eennback-002-site1.atempurl.com';
+  // If in production (deployed on Vercel), use the production API
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    const isProduction = hostname !== 'localhost' && hostname !== '127.0.0.1';
+    
+    if (isProduction) {
+      console.warn('⚠️ NEXT_PUBLIC_API_URL not set in Vercel environment variables');
+      console.warn('Using production API fallback: https://eennback-002-site1.atempurl.com');
+      return 'https://eennback-002-site1.atempurl.com';
+    }
   }
   
   // For local development, use localhost
+  console.log('Using localhost for development');
   return 'https://localhost:7065';
 };
 
