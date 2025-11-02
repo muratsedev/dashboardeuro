@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
+import { getApiEndpoint } from '@/lib/api-config';
 
 interface CreateBreakingNewsForm {
   title: string;
@@ -31,7 +32,7 @@ export default function CreateBreakingNewsPage() {
     try {
       setLoading(true);
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065'}/api/BreakingNews`, {
+      const response = await fetch(getApiEndpoint('/api/BreakingNews'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

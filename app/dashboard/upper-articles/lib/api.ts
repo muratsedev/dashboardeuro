@@ -9,7 +9,24 @@ if (typeof window === 'undefined') {
   }
 }
 
-const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065';
+// Smart API URL configuration with production fallback
+const getBaseApiUrl = () => {
+  // If environment variable is set, use it
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  
+  // If in production (deployed), use the production API
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+    console.warn('⚠️ NEXT_PUBLIC_API_URL not set, using production fallback');
+    return 'https://eennback-002-site1.atempurl.com';
+  }
+  
+  // For local development, use localhost
+  return 'https://localhost:7065';
+};
+
+const BASE_API_URL = getBaseApiUrl();
 const UpperArticles_API_URL = `${BASE_API_URL}/api/UpperArticles`;
 
 // UpperArticles API Functions

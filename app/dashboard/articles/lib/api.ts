@@ -51,12 +51,35 @@ api.interceptors.response.use(
   }
 );
 
-const BASE_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065';
+// Smart API URL configuration with production fallback
+const getBaseApiUrl = () => {
+  // If environment variable is set, use it
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  
+  // If in production (deployed), use the production API
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+    console.warn('⚠️ NEXT_PUBLIC_API_URL not set, using production fallback');
+    return 'https://eennback-002-site1.atempurl.com';
+  }
+  
+  // For local development, use localhost
+  return 'https://localhost:7065';
+};
+
+const BASE_API_URL = getBaseApiUrl();
 const API_URL = `${BASE_API_URL}/api/Articles`;
 const Categories_API_URL = `${BASE_API_URL}/api/Categories`;
 const Tags_API_URL = `${BASE_API_URL}/api/Tags`;
 const PodcastTypes_API_URL = `${BASE_API_URL}/api/PodcastTypes`;
 const UpperArticles_API_URL = `${BASE_API_URL}/api/UpperArticles`;
+
+console.log('🔗 API Configuration:', {
+  BASE_API_URL,
+  hostname: typeof window !== 'undefined' ? window.location.hostname : 'server',
+  envVarSet: !!process.env.NEXT_PUBLIC_API_URL
+});
 
 export const updateArticle = async (id: string, articleData: ArticleCreate, file?: File): Promise<ArticleAll> => {
   try {

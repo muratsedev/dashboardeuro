@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { PlusIcon, PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
+import { getApiEndpoint } from '@/lib/api-config';
 
 interface BreakingNews {
   id: number;
@@ -21,7 +22,7 @@ export default function BreakingNewsPage() {
   const fetchBreakingNews = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065'}/api/BreakingNews`, {
+      const response = await fetch(getApiEndpoint('/api/BreakingNews'), {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -52,7 +53,7 @@ export default function BreakingNewsPage() {
     }
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065'}/api/BreakingNews/${id}`, {
+      const response = await fetch(getApiEndpoint(`/api/BreakingNews/${id}`), {
         method: 'DELETE',
       });
 
@@ -70,7 +71,7 @@ export default function BreakingNewsPage() {
 
   const togglePublish = async (id: number, currentStatus: boolean) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065'}/api/BreakingNews/${id}`, {
+      const response = await fetch(getApiEndpoint(`/api/BreakingNews/${id}`), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

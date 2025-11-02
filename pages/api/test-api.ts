@@ -2,8 +2,8 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
 import https from 'https';
 
-// Backend API configuration
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065';
+// Backend API configuration with production fallback
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://eennback-002-site1.atempurl.com';
 
 // Configure axios to handle HTTPS development certificates
 const axiosInstance = axios.create({

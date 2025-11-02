@@ -27,7 +27,7 @@ interface ApiDebugResponse {
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   console.log('=== API Debug Test ===');
   
-  const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065';
+  const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://eennback-002-site1.atempurl.com';
   console.log('Testing connection to:', BASE_URL);
 
   const testResults: ApiDebugResponse = {
