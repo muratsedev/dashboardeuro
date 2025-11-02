@@ -360,6 +360,9 @@ export const createArticle = async (articleData: ArticleCreate, file?: File): Pr
 
 export const getArticles = async (): Promise<ArticleAll[]> => {
   try {
+    console.log('Fetching articles from:', API_URL);
+    console.log('BASE_API_URL:', BASE_API_URL);
+    
     const response = await api.get(API_URL, {
       headers: {
         'Cache-Control': 'no-cache',
@@ -374,6 +377,16 @@ export const getArticles = async (): Promise<ArticleAll[]> => {
     return response.data;
   } catch (error) {
     console.error('Error in getArticles:', error);
+    if (axios.isAxiosError(error)) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch articles';
+      console.error('Detailed error:', {
+        message: errorMessage,
+        status: error.response?.status,
+        url: API_URL,
+        baseUrl: BASE_API_URL
+      });
+      throw new Error(`فشل في الاتصال بالخادم: ${errorMessage}`);
+    }
     throw error;
   }
 };
