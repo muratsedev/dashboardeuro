@@ -15,11 +15,13 @@ if (typeof window === 'undefined') {
 
 // Create axios instance with better error handling
 const api = axios.create({
-  timeout: 15000,
+  timeout: 30000, // Increased timeout for slower connections
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
-  }
+  },
+  // Allow credentials for CORS
+  withCredentials: false
 });
 
 // Add request interceptor for debugging
@@ -391,31 +393,46 @@ export const createArticle = async (articleData: ArticleCreate, file?: File): Pr
 
 export const getArticles = async (): Promise<ArticleAll[]> => {
   try {
-    console.log('Fetching articles from:', API_URL);
-    console.log('BASE_API_URL:', BASE_API_URL);
+    console.log('🔄 Fetching articles from:', API_URL);
+    console.log('📍 BASE_API_URL:', BASE_API_URL);
+    console.log('🌐 Current hostname:', typeof window !== 'undefined' ? window.location.hostname : 'server');
     
     const response = await api.get(API_URL, {
       headers: {
         'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache'
+        'Pragma': 'no-cache',
+        'Accept': 'application/json'
       },
       // Add timestamp to prevent caching
       params: {
         _t: Date.now()
       }
     });
-    console.log('Raw API response:', response.data);
+    
+    console.log('✅ API Response Status:', response.status);
+    console.log('✅ Articles count:', Array.isArray(response.data) ? response.data.length : 'Not an array');
+    console.log('📦 Raw API response:', response.data);
+    
+    if (!Array.isArray(response.data)) {
+      console.error('❌ Response is not an array:', typeof response.data);
+      throw new Error('Invalid response format: expected array of articles');
+    }
+    
     return response.data;
   } catch (error) {
-    console.error('Error in getArticles:', error);
+    console.error('❌ Error in getArticles:', error);
     if (axios.isAxiosError(error)) {
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch articles';
-      console.error('Detailed error:', {
-        message: errorMessage,
+      console.error('Axios Error Details:', {
+        message: error.message,
+        code: error.code,
         status: error.response?.status,
+        statusText: error.response?.statusText,
         url: API_URL,
-        baseUrl: BASE_API_URL
+        baseUrl: BASE_API_URL,
+        responseData: error.response?.data
       });
+      
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch articles';
       throw new Error(`فشل في الاتصال بالخادم: ${errorMessage}`);
     }
     throw error;
