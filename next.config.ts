@@ -3,7 +3,7 @@ import path from "path";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  // Configure for Netlify server-side deployment (supports API routes)
+  // Configure for Vercel deployment with external API
   images: {
     remotePatterns: [
       // Development configuration
@@ -13,13 +13,41 @@ const nextConfig: NextConfig = {
         port: '7065',
         pathname: '/uploads/**',
       },
-      // Production configuration - add your production API domain here
+      // Production configuration - your cloud API domain
       {
         protocol: 'https',
-        hostname: '**', // Allow all HTTPS domains for flexibility
+        hostname: 'eennback-002-site1.atempurl.com',
+        pathname: '/uploads/**',
+      },
+      // Fallback for other HTTPS domains
+      {
+        protocol: 'https',
+        hostname: '**',
         pathname: '/uploads/**',
       },
     ],
+  },
+  // Add headers for CORS handling with external API
+  async headers() {
+    return [
+      {
+        source: '/api/:path*',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*',
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET, POST, PUT, DELETE, OPTIONS',
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Content-Type, Authorization',
+          },
+        ],
+      },
+    ];
   },
   experimental: {
     serverActions: {

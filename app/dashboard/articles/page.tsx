@@ -71,7 +71,35 @@ export default function Articles() {
   };
 
   if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md text-center">
+          <h3 className="text-lg font-semibold text-red-800 mb-2">خطأ في الاتصال</h3>
+          <p className="text-red-600 mb-4">فشل في الاتصال بالخادم</p>
+          <p className="text-sm text-gray-600 mb-4">
+            تأكد من أن الخادم يعمل والاتصال بالإنترنت متاح
+          </p>
+          <button
+            onClick={() => {
+              setError(null);
+              fetchArticles();
+            }}
+            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
+          >
+            إعادة المحاولة
+          </button>
+          <details className="mt-4 text-left">
+            <summary className="text-xs text-gray-500 cursor-pointer">تفاصيل الخطأ</summary>
+            <p className="text-xs text-gray-400 mt-2 font-mono">{error}</p>
+            <p className="text-xs text-gray-400 mt-1 font-mono">
+              API URL: {process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065'}
+            </p>
+          </details>
+        </div>
+      </div>
+    );
+  }
   
   const handleViewArticle = (id: string) => {
     router.push(`/dashboard/articles/${id}`);
