@@ -26,7 +26,15 @@ export default function Articles() {
   const fetchArticles = async () => {
     try {
       setIsLoading(true);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065';
       console.log('Fetching articles from API...');
+      console.log('API URL:', apiUrl);
+      
+      // Check if using localhost in production
+      if (apiUrl.includes('localhost') && typeof window !== 'undefined') {
+        throw new Error('⚠️ Environment variable NEXT_PUBLIC_API_URL is not set in Vercel! Using localhost fallback which will not work in production.');
+      }
+      
       const data = await getArticles();
       console.log('Articles data received:', data);
       setArticles(data);
@@ -72,29 +80,61 @@ export default function Articles() {
 
   if (isLoading) return <div>Loading...</div>;
   if (error) {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065';
+    const isLocalhostError = apiUrl.includes('localhost');
+    
     return (
-      <div className="flex flex-col items-center justify-center h-64 space-y-4">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md text-center">
+      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4 p-4">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-2xl">
           <h3 className="text-lg font-semibold text-red-800 mb-2">خطأ في الاتصال</h3>
           <p className="text-red-600 mb-4">فشل في الاتصال بالخادم</p>
+          
+          {isLocalhostError && (
+            <div className="bg-yellow-100 border border-yellow-300 rounded p-4 mb-4 text-right">
+              <h4 className="font-bold text-yellow-900 mb-2">⚠️ متغير البيئة غير مُعرّف</h4>
+              <p className="text-sm text-yellow-800 mb-2">
+                المتغير <code className="bg-yellow-200 px-1 rounded">NEXT_PUBLIC_API_URL</code> غير معرف في Vercel
+              </p>
+              <p className="text-sm text-yellow-800 mb-2">
+                الرجاء إضافة المتغير في إعدادات Vercel:
+              </p>
+              <ol className="text-sm text-yellow-900 list-decimal list-inside space-y-1 mr-2">
+                <li>اذهب إلى Vercel Dashboard → Settings → Environment Variables</li>
+                <li>أضف متغير جديد: NEXT_PUBLIC_API_URL</li>
+                <li>القيمة: <code className="bg-yellow-200 px-1 rounded text-xs">https://eennback-002-site1.atempurl.com</code></li>
+                <li>اختر جميع البيئات (Production, Preview, Development)</li>
+                <li>احفظ وأعد النشر</li>
+              </ol>
+            </div>
+          )}
+          
           <p className="text-sm text-gray-600 mb-4">
             تأكد من أن الخادم يعمل والاتصال بالإنترنت متاح
           </p>
+          
           <button
             onClick={() => {
               setError(null);
               fetchArticles();
             }}
-            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
+            className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors mb-4"
           >
             إعادة المحاولة
           </button>
+          
           <details className="mt-4 text-left">
-            <summary className="text-xs text-gray-500 cursor-pointer">تفاصيل الخطأ</summary>
-            <p className="text-xs text-gray-400 mt-2 font-mono">{error}</p>
-            <p className="text-xs text-gray-400 mt-1 font-mono">
-              API URL: {process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065'}
-            </p>
+            <summary className="text-xs text-gray-500 cursor-pointer hover:text-gray-700">تفاصيل الخطأ (للمطورين)</summary>
+            <div className="mt-2 bg-gray-800 text-green-400 p-3 rounded text-xs font-mono overflow-auto">
+              <div className="mb-2">
+                <strong className="text-yellow-400">Error:</strong> {error}
+              </div>
+              <div className="mb-2">
+                <strong className="text-yellow-400">API URL:</strong> {apiUrl}
+              </div>
+              <div>
+                <strong className="text-yellow-400">Status:</strong> {isLocalhostError ? 'Using localhost (WRONG for production!)' : 'Using production URL'}
+              </div>
+            </div>
           </details>
         </div>
       </div>
