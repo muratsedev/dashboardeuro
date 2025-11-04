@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
+import { getApiUrl } from '../../../../../lib/api-config';
 
 interface BreakingNews {
   id: number;
@@ -36,7 +37,7 @@ export default function EditBreakingNewsPage() {
   const fetchBreakingNews = useCallback(async () => {
     try {
       setFetchLoading(true);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065'}/api/BreakingNews/${id}`, {
+      const response = await fetch(`${getApiUrl()}/api/BreakingNews/${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -79,7 +80,7 @@ export default function EditBreakingNewsPage() {
     try {
       setLoading(true);
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065'}/api/BreakingNews/${id}`, {
+      const response = await fetch(`${getApiUrl()}/api/BreakingNews/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -51,9 +51,10 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     serverActions: {
-      allowedOrigins: process.env.NODE_ENV === 'production' 
-        ? [process.env.NEXT_PUBLIC_API_URL?.replace('https://', '') || '']
-        : ['localhost:7065'],
+      allowedOrigins: [
+        'eennback-002-site1.atempurl.com',
+        'localhost:7065'
+      ],
     },
     // Enable faster builds and better caching
     turbo: {

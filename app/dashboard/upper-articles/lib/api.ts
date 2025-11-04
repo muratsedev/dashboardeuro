@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { UpperArticle, CreateUpperArticleDto, UpdateUpperArticleDto } from '../types/UpperArticle';
+import { getApiUrl } from '../../../../lib/api-config';
 
 // Configure axios for HTTPS development with self-signed certificates
 if (typeof window === 'undefined') {
@@ -9,24 +10,7 @@ if (typeof window === 'undefined') {
   }
 }
 
-// Smart API URL configuration with production fallback
-const getBaseApiUrl = () => {
-  // If environment variable is set, use it
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL;
-  }
-  
-  // If in production (deployed), use the production API
-  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-    console.warn('⚠️ NEXT_PUBLIC_API_URL not set, using production fallback');
-    return 'https://eennback-002-site1.atempurl.com';
-  }
-  
-  // For local development, use localhost
-  return 'https://localhost:7065';
-};
-
-const BASE_API_URL = getBaseApiUrl();
+const BASE_API_URL = getApiUrl();
 const UpperArticles_API_URL = `${BASE_API_URL}/api/UpperArticles`;
 
 // UpperArticles API Functions

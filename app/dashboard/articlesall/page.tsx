@@ -3,6 +3,7 @@ import Link from "next/link";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import EmptyState from "../../../components/EmptyState";
 import { useState, useEffect } from "react";
+import { getApiUrl } from "../../../lib/api-config";
 
 type Article = {
   id: string;
@@ -26,7 +27,7 @@ const ArticlesPage = () => {
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065'}/api/Articles`);
+        const response = await fetch(`${getApiUrl()}/api/Articles`);
         if (!response.ok) {
           throw new Error('Failed to fetch articles');
         }

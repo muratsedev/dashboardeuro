@@ -13,6 +13,7 @@ import {
 import { getArticles } from "./lib/api";
 import { ArticleAll } from "./types/Article";
 import EmptyState from "../../../components/EmptyState";
+import { getApiUrl } from "../../../lib/api-config";
 
 export default function Articles() {
   const [articles, setArticles] = useState<ArticleAll[]>([]);
@@ -73,18 +74,7 @@ export default function Articles() {
 
   if (isLoading) return <div>Loading...</div>;
   if (error) {
-    // Smart detection of API URL
-    const getActualApiUrl = () => {
-      if (process.env.NEXT_PUBLIC_API_URL) {
-        return process.env.NEXT_PUBLIC_API_URL;
-      }
-      if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-        return 'https://eennback-002-site1.atempurl.com';
-      }
-      return 'https://localhost:7065';
-    };
-    
-    const apiUrl = getActualApiUrl();
+    const apiUrl = getApiUrl();
     const isLocalhostError = apiUrl.includes('localhost');
     const isEnvVarMissing = !process.env.NEXT_PUBLIC_API_URL && typeof window !== 'undefined' && window.location.hostname !== 'localhost';
     
@@ -170,7 +160,7 @@ export default function Articles() {
   const handleDeleteArticle = async (id: string) => {
     if (window.confirm("هل أنت متأكد من حذف هذا المقال؟")) {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065'}/api/Articles/${id}`, {
+        const response = await fetch(`${getApiUrl()}/api/Articles/${id}`, {
           method: "DELETE",
         });
 

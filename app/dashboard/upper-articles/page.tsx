@@ -13,6 +13,7 @@ import {
 import { getUpperArticles } from "../articles/lib/api";
 import { UpperArticle } from "../articles/types/UpperArticle";
 import EmptyState from "../../../components/EmptyState";
+import { getApiUrl } from "../../../lib/api-config";
 
 export default function UpperArticles() {
   const [upperArticles, setUpperArticles] = useState<UpperArticle[]>([]);
@@ -68,7 +69,7 @@ export default function UpperArticles() {
   const handleDeleteUpperArticle = async (id: number) => {
     if (window.confirm("هل أنت متأكد من حذف هذا المقال العلوي؟")) {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065'}/api/UpperArticles/${id}`, {
+        const response = await fetch(`${getApiUrl()}/api/UpperArticles/${id}`, {
           method: "DELETE",
         });
 

@@ -35,25 +35,9 @@ api.interceptors.response.use(
   }
 );
 
-// API URL configuration with production fallback
-const getBaseApiUrl = () => {
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL;
-  }
-  
-  if (typeof window !== 'undefined') {
-    const hostname = window.location.hostname;
-    const isProduction = hostname !== 'localhost' && hostname !== '127.0.0.1';
-    
-    if (isProduction) {
-      return 'https://eennback-002-site1.atempurl.com';
-    }
-  }
-  
-  return 'https://localhost:7065';
-};
+import { getApiUrl } from '../../../../lib/api-config';
 
-const BASE_API_URL = getBaseApiUrl();
+const BASE_API_URL = getApiUrl();
 const API_URL = `${BASE_API_URL}/api/Articles`;
 const Categories_API_URL = `${BASE_API_URL}/api/Categories`;
 const Tags_API_URL = `${BASE_API_URL}/api/Tags`;

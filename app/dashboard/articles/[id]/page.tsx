@@ -4,6 +4,7 @@ import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { ArticleCreate } from "../types/Article";
+import { getApiUrl } from "../../../../lib/api-config";
 //import Image from "next/image";
 
 
@@ -16,7 +17,7 @@ export default function ViewArticle({ params }: { params: Promise<{ id: string }
   useEffect(() => {
     const fetchArticle = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065'}/api/Articles/${id}`);
+        const response = await fetch(`${getApiUrl()}/api/Articles/${id}`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

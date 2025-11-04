@@ -17,6 +17,7 @@ import Image from "next/image";
 import { getCategories, getTags, getPodcastTypes, getUpperArticles, getArticles, updateArticle } from "../../lib/api";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import { getApiUrl } from "../../../../../lib/api-config";
 
 
 export default function EditArticle({ params }: { params: Promise<{ id: string }> }) {
@@ -55,8 +56,7 @@ export default function EditArticle({ params }: { params: Promise<{ id: string }
       try {
         setLoading(true);
         // Fetch article data
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065';
-        const articleUrl = `${apiUrl}/api/Articles/${id}`;
+        const articleUrl = `${getApiUrl()}/api/Articles/${id}`;
         
         const articleResponse = await fetch(articleUrl, {
           method: 'GET',
@@ -144,9 +144,10 @@ export default function EditArticle({ params }: { params: Promise<{ id: string }
             let imageUrl = articleData.imagePath;
             if (!imageUrl.startsWith('http')) {
               // If it's a relative path, prepend the base URL
+              const apiUrl = getApiUrl();
               imageUrl = imageUrl.startsWith('/') 
-                ? `${process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065'}${imageUrl}` 
-                : `${process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065'}/${imageUrl}`;
+                ? `${apiUrl}${imageUrl}` 
+                : `${apiUrl}/${imageUrl}`;
             }
             setCurrentImage(imageUrl);
           } catch (error) {

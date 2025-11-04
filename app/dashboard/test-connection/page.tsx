@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { getApiUrl } from '../../../lib/api-config';
 
 interface ArticleData {
   id: string;
@@ -44,7 +45,7 @@ export default function TestConnectionPage() {
     setResult(null);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065';
+      const apiUrl = getApiUrl();
       
       console.log('Testing connection to:', apiUrl);
       
@@ -140,7 +141,7 @@ export default function TestConnectionPage() {
       
       <div className="bg-gray-100 p-4 rounded mb-6">
         <p className="text-sm text-gray-700">
-          <strong>API URL:</strong> {process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065'}
+          <strong>API URL:</strong> {getApiUrl()}
         </p>
         <p className="text-sm text-gray-700 mt-2">
           <strong>Environment:</strong> {process.env.NODE_ENV || 'development'}
