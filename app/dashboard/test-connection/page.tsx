@@ -2,12 +2,35 @@
 
 import { useState } from 'react';
 
+interface ArticleData {
+  id: string;
+  articleTitle?: string;
+  articleSummary?: string;
+  articleContent?: string;
+  content?: string;
+  categoryId?: number;
+  category?: unknown;
+  tagId?: number | null;
+  podcastTypeId?: number | null;
+  upperArticleId?: number | null;
+  imagePath?: string;
+}
+
 interface TestResult {
   success: boolean;
   status: number;
   dataLength: number | string;
   sampleData: unknown;
   apiUrl: string;
+  specificArticleTest?: {
+    id: string;
+    success: boolean;
+    data?: ArticleData;
+    error?: string;
+    fieldsPresent?: {
+      [key: string]: boolean;
+    };
+  };
 }
 
 export default function TestConnectionPage() {
@@ -34,18 +57,74 @@ export default function TestConnectionPage() {
 
       console.log('Response status:', response.status);
       console.log('Response ok:', response.ok);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
       }
 
-      const data = await response.json();
+      const responseText = await response.text();
+      console.log('Raw response text:', responseText);
+
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        throw new Error(`Failed to parse JSON: ${parseError}, Response: ${responseText.substring(0, 200)}...`);
+      }
+
+      console.log('Parsed data:', data);
+
+      // Test a specific article if any exist
+      let specificArticleTest = null;
+      if (Array.isArray(data) && data.length > 0) {
+        const firstArticleId = data[0].id;
+        try {
+          const articleResponse = await fetch(`${apiUrl}/api/Articles/${firstArticleId}`, {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+            },
+          });
+          
+          if (articleResponse.ok) {
+            const articleText = await articleResponse.text();
+            const articleData = JSON.parse(articleText);
+            specificArticleTest = {
+              id: firstArticleId,
+              success: true,
+              data: articleData,
+              fieldsPresent: {
+                articleTitle: !!articleData.articleTitle,
+                articleSummary: !!articleData.articleSummary,
+                articleContent: !!articleData.articleContent,
+                content: !!articleData.content,
+                categoryId: !!articleData.categoryId,
+                category: !!articleData.category,
+                tagId: articleData.tagId !== null && articleData.tagId !== undefined,
+                podcastTypeId: articleData.podcastTypeId !== null && articleData.podcastTypeId !== undefined,
+                upperArticleId: articleData.upperArticleId !== null && articleData.upperArticleId !== undefined,
+                imagePath: !!articleData.imagePath
+              }
+            };
+          }
+        } catch (articleError) {
+          specificArticleTest = {
+            id: firstArticleId,
+            success: false,
+            error: articleError instanceof Error ? articleError.message : String(articleError)
+          };
+        }
+      }
+
       setResult({
         success: true,
         status: response.status,
         dataLength: Array.isArray(data) ? data.length : 'Not an array',
         sampleData: Array.isArray(data) ? data[0] : data,
-        apiUrl: apiUrl
+        apiUrl: apiUrl,
+        specificArticleTest: specificArticleTest || undefined
       });
     } catch (err) {
       console.error('Connection test failed:', err);

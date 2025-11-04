@@ -55,10 +55,21 @@ export default function EditArticle({ params }: { params: Promise<{ id: string }
       try {
         setLoading(true);
         // Fetch article data
-        const articleResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065'}/api/Articles/${id}`);
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:7065';
+        const articleUrl = `${apiUrl}/api/Articles/${id}`;
+        
+        const articleResponse = await fetch(articleUrl, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
+        
         if (!articleResponse.ok) {
           throw new Error(`HTTP error! status: ${articleResponse.status}`);
         }
+        
         const articleData = await articleResponse.json();
         // Fetch all related data in parallel
         const [categoriesData, tagsData, podcastTypesData, allUpperArticlesData, allArticlesData] = await Promise.all([
@@ -90,9 +101,10 @@ export default function EditArticle({ params }: { params: Promise<{ id: string }
         }
         // Handle category ID
         let categoryId = { id: 0, name: '' };
-        if (articleData.category) {
+        
+        if (articleData.category && articleData.category.id) {
           categoryId = {
-            id: articleData.category.id || 0,
+            id: articleData.category.id,
             name: articleData.category.name || ''
           };
         } else if (articleData.categoryId && Array.isArray(categoriesData)) {
@@ -102,20 +114,27 @@ export default function EditArticle({ params }: { params: Promise<{ id: string }
               id: foundCategory.id,
               name: foundCategory.name
             };
+          } else {
+            categoryId = {
+              id: articleData.categoryId,
+              name: ''
+            };
           }
         }
+
+        // Set form data with safe value handling
         setFormData({
           articleTitle: articleData.articleTitle || '',
           articleSummary: articleData.articleSummary || '',
           articleContent: articleData.articleContent || '',
-          content: articleData.content || '',
-          isPublished: articleData.isPublished ?? false,
-          facebook: articleData.facebook ?? false,
-          twitter: articleData.twitter ?? false,
+          content: articleData.content || articleData.articleContent || '',
+          isPublished: Boolean(articleData.isPublished),
+          facebook: Boolean(articleData.facebook),
+          twitter: Boolean(articleData.twitter),
           categoryId: categoryId,
-          tagId: articleData.tagId ?? undefined,
-          podcastTypeId: articleData.podcastTypeId ?? undefined,
-          upperArticleId: articleData.upperArticleId ?? undefined,
+          tagId: articleData.tagId || undefined,
+          podcastTypeId: articleData.podcastTypeId || undefined,
+          upperArticleId: articleData.upperArticleId || undefined,
         });
         
         // Set current image if exists
@@ -269,28 +288,13 @@ export default function EditArticle({ params }: { params: Promise<{ id: string }
     }
     setIsSubmitting(true);
     try {
-      console.log('Form data before submission:', {
-        upperArticleId: formData.upperArticleId,
-        tagId: formData.tagId,
-        podcastTypeId: formData.podcastTypeId,
-        categoryId: formData.categoryId.id
-      });
-
       const articleData: ArticleCreate = {
         ...formData,
-        // Ensure proper handling of UpperArticle removal
         upperArticleId: formData.upperArticleId === null || formData.upperArticleId === undefined
           ? 0
           : formData.upperArticleId,
         createdDate: new Date()
       };
-
-      console.log('Article data being sent to API:', {
-        upperArticleId: articleData.upperArticleId,
-        tagId: articleData.tagId,
-        podcastTypeId: articleData.podcastTypeId,
-        categoryId: articleData.categoryId.id
-      });
 
       await updateArticle(id, articleData, selectedFile || undefined);
       toast.success("تم تحديث المقال بنجاح", {
@@ -306,9 +310,6 @@ export default function EditArticle({ params }: { params: Promise<{ id: string }
         router.push("/dashboard/articles");
       }, 1500);
     } catch (error) {
-      console.error("Error updating article:", error);
-      
-      // Check if it's an upper article conflict error
       let errorMessage = "فشل في تحديث المقال";
       if (error instanceof Error && error.message.includes("already linked")) {
         errorMessage = "المقال العلوي المحدد مربوط بالفعل بمقال آخر. يرجى اختيار مقال علوي آخر أو إزالته.";
@@ -369,14 +370,23 @@ export default function EditArticle({ params }: { params: Promise<{ id: string }
             <div className="lg:col-span-2">
               <label htmlFor="articleContent" className="block text-sm font-medium text-gray-700 text-right mb-2">محتوى المقال</label>
               <div className={`${errors.articleContent ? 'border-2 border-red-500 rounded-md' : ''} overflow-hidden`}>
-                <CKEditor editor={ClassicEditor} data={formData.articleContent} onChange={(event, editor) => {
-                  const editorInstance = editor as { getData: () => string };
-                  const data = editorInstance.getData();
-                  setFormData((prev) => ({ ...prev, articleContent: data }));
-                  if (errors.articleContent) {
-                    setErrors((prev) => { const newErrors = { ...prev }; delete newErrors.articleContent; return newErrors; });
-                  }
-                }} config={{ language: 'ar', removePlugins: ['Title'], toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'indent', 'outdent', '|', 'blockQuote', 'insertTable', 'undo', 'redo'] }} />
+                <CKEditor 
+                  editor={ClassicEditor} 
+                  data={formData.articleContent || ''} 
+                  onChange={(event, editor) => {
+                    const editorInstance = editor as { getData: () => string };
+                    const data = editorInstance.getData();
+                    setFormData((prev) => ({ ...prev, articleContent: data }));
+                    if (errors.articleContent) {
+                      setErrors((prev) => { const newErrors = { ...prev }; delete newErrors.articleContent; return newErrors; });
+                    }
+                  }} 
+                  config={{ 
+                    language: 'ar', 
+                    removePlugins: ['Title'], 
+                    toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'indent', 'outdent', '|', 'blockQuote', 'insertTable', 'undo', 'redo'] 
+                  }} 
+                />
               </div>
               {errors.articleContent && (<p className="mt-1 text-sm text-red-600 text-right">{errors.articleContent}</p>)}
             </div>

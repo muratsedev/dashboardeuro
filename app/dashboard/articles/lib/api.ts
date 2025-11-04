@@ -24,57 +24,32 @@ const api = axios.create({
   withCredentials: false
 });
 
-// Add request interceptor for debugging
-api.interceptors.request.use(
-  (config) => {
-    console.log('API Request:', config.method?.toUpperCase(), config.url);
-    return config;
-  },
-  (error) => {
-    console.error('API Request Error:', error);
-    return Promise.reject(error);
-  }
-);
-
 // Add response interceptor for better error handling
 api.interceptors.response.use(
-  (response) => {
-    console.log('API Response:', response.status, response.config.url);
-    return response;
-  },
+  (response) => response,
   (error) => {
-    console.error('API Response Error:', {
-      url: error.config?.url,
-      status: error.response?.status,
-      message: error.message,
-      data: error.response?.data
-    });
+    if (process.env.NODE_ENV === 'development') {
+      console.error('API Error:', error.response?.status, error.config?.url);
+    }
     return Promise.reject(error);
   }
 );
 
-// Smart API URL configuration with production fallback
+// API URL configuration with production fallback
 const getBaseApiUrl = () => {
-  // If environment variable is set, use it
   if (process.env.NEXT_PUBLIC_API_URL) {
-    console.log('✅ Using NEXT_PUBLIC_API_URL from environment:', process.env.NEXT_PUBLIC_API_URL);
     return process.env.NEXT_PUBLIC_API_URL;
   }
   
-  // If in production (deployed on Vercel), use the production API
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
     const isProduction = hostname !== 'localhost' && hostname !== '127.0.0.1';
     
     if (isProduction) {
-      console.warn('⚠️ NEXT_PUBLIC_API_URL not set in Vercel environment variables');
-      console.warn('Using production API fallback: https://eennback-002-site1.atempurl.com');
       return 'https://eennback-002-site1.atempurl.com';
     }
   }
   
-  // For local development, use localhost
-  console.log('Using localhost for development');
   return 'https://localhost:7065';
 };
 
@@ -85,23 +60,8 @@ const Tags_API_URL = `${BASE_API_URL}/api/Tags`;
 const PodcastTypes_API_URL = `${BASE_API_URL}/api/PodcastTypes`;
 const UpperArticles_API_URL = `${BASE_API_URL}/api/UpperArticles`;
 
-console.log('🔗 API Configuration:', {
-  BASE_API_URL,
-  hostname: typeof window !== 'undefined' ? window.location.hostname : 'server',
-  envVarSet: !!process.env.NEXT_PUBLIC_API_URL
-});
-
 export const updateArticle = async (id: string, articleData: ArticleCreate, file?: File): Promise<ArticleAll> => {
   try {
-    console.log('Updating article with data:', {
-      id: id,
-      title: articleData.articleTitle,
-      summary: articleData.articleSummary,
-      categoryId: articleData.categoryId.id,
-      upperArticleId: articleData.upperArticleId,
-      hasFile: !!file
-    });
-
     const formData = new FormData();
     
     // Append basic article data
@@ -139,11 +99,6 @@ export const updateArticle = async (id: string, articleData: ArticleCreate, file
     // Append image file if it exists
     if (file) {
       formData.append('Image', file, file.name);
-      console.log('Uploading file:', {
-        name: file.name,
-        size: file.size,
-        type: file.type
-      });
     }
 
     const response = await fetch(`${API_URL}/${id}`, {
@@ -153,55 +108,31 @@ export const updateArticle = async (id: string, articleData: ArticleCreate, file
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Update article failed:', errorText);
       throw new Error(errorText || `HTTP error! status: ${response.status}`);
     }
 
-    // Check if response has content before trying to parse as JSON
     const responseText = await response.text();
-    console.log('Raw response:', responseText);
     
     if (!responseText.trim()) {
-      // Empty response - this is often successful for updates
-      console.log('Article updated successfully (empty response)');
-      return {} as ArticleAll; // Return empty object for successful updates with no content
+      return {} as ArticleAll;
     }
     
     try {
       const result = JSON.parse(responseText);
-      console.log('Article updated successfully:', result);
       return result;
-    } catch (parseError) {
-      console.error('Failed to parse JSON response:', parseError);
-      console.error('Response was:', responseText);
-      // If JSON parsing fails but the request was successful, still return success
+    } catch {
       if (response.status >= 200 && response.status < 300) {
-        console.log('Update successful despite JSON parsing issue');
         return {} as ArticleAll;
       }
       throw new Error(`Invalid JSON response: ${responseText}`);
     }
   } catch (error) {
-    console.error('Error in updateArticle:', error);
     throw error;
   }
 };
 
 export const createArticle = async (articleData: ArticleCreate, file?: File): Promise<ArticleAll> => {
   try {
-    console.log('=== STARTING CREATE ARTICLE ===');
-    console.log('Creating article with data:', {
-      title: articleData.articleTitle,
-      summary: articleData.articleSummary,
-      categoryId: articleData.categoryId?.id,
-      categoryIdType: typeof articleData.categoryId?.id,
-      upperArticleId: articleData.upperArticleId,
-      upperArticleIdType: typeof articleData.upperArticleId,
-      hasFile: !!file,
-      fileName: file?.name,
-      fileSize: file?.size
-    });
-
     // Validate required fields
     if (!articleData.articleTitle?.trim()) {
       throw new Error('Article title is required');
@@ -216,36 +147,24 @@ export const createArticle = async (articleData: ArticleCreate, file?: File): Pr
       throw new Error('Category ID is required');
     }
 
-    console.log('=== CHECKING CATEGORY ===');
     // Check if category exists
     let categoryResponse;
     try {
       categoryResponse = await axios.get(`${Categories_API_URL}/${articleData.categoryId.id}`);
-      console.log('Category response:', categoryResponse.data);
       if (!categoryResponse.data) {
         throw new Error('Category not found');
       }
-    } catch (categoryError) {
-      console.error('Category lookup failed:', categoryError);
+    } catch {
       throw new Error(`Category with ID ${articleData.categoryId.id} not found`);
     }
 
-    console.log('=== CREATING FORMDATA ===');
     // Create FormData for multipart/form-data submission
     const formData = new FormData();
     
-    try {
-      // Append article data
-      console.log('Adding basic fields to FormData...');
-      formData.append('articleTitle', articleData.articleTitle);
-      formData.append('articleSummary', articleData.articleSummary);
-      formData.append('articleContent', articleData.articleContent);
-      formData.append('categoryId', articleData.categoryId.id.toString());
-      console.log('Basic fields added successfully');
-    } catch (formDataError) {
-      console.error('Error adding basic fields to FormData:', formDataError);
-      throw new Error('Failed to prepare basic article data');
-    }
+    formData.append('articleTitle', articleData.articleTitle);
+    formData.append('articleSummary', articleData.articleSummary);
+    formData.append('articleContent', articleData.articleContent);
+    formData.append('categoryId', articleData.categoryId.id.toString());
     
     // Append additional fields if they exist in ArticleCreate
     if (articleData.isPublished !== undefined) {
@@ -263,69 +182,31 @@ export const createArticle = async (articleData: ArticleCreate, file?: File): Pr
     if (articleData.podcastTypeId !== undefined) {
       formData.append('podcastTypeId', articleData.podcastTypeId.toString());
     }
-    // Always send upperArticleId (0 means no assignment/remove assignment)
+    
     const upperArticleIdValue = articleData.upperArticleId ?? 0;
-    console.log('Adding upperArticleId to FormData:', upperArticleIdValue, typeof upperArticleIdValue);
     formData.append('upperArticleId', upperArticleIdValue.toString());
     
-    // Send required date fields - backend expects DateTimeOffset
     const now = new Date().toISOString();
     formData.append('createdDate', articleData.createdDate ? articleData.createdDate.toISOString() : now);
     formData.append('updatedDate', now);
-    console.log('Added date fields:', { createdDate: articleData.createdDate?.toISOString() || now, updatedDate: now });
 
-    // Append image file if it exists - FIXED: Use 'Image' instead of 'imageFile'
     if (file) {
       formData.append('Image', file, file.name);
-      console.log('Uploading file:', {
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        fieldName: 'Image'
-      });
     }
 
-    // Log FormData entries for debugging
-    console.log('FormData entries:');
-    for (const [key, value] of formData.entries()) {
-      if (value instanceof File) {
-        console.log(key, `File: ${value.name} (${value.size} bytes, ${value.type})`);
-      } else {
-        console.log(key, value);
-      }
-    }
-    
-    // Log request URL and method
-    console.log('Making POST request to:', API_URL);
-    console.log('Request headers will include Accept: application/json');
-
-    // Send the request with proper headers for file upload
-    // Note: Don't manually set Content-Type for multipart/form-data, let axios handle it
-    console.log('About to send POST request to:', API_URL);
     const response = await axios.post<ArticleAll>(API_URL, formData, {
       headers: {
         'Accept': 'application/json'
       },
-      timeout: 30000, // 30 second timeout
+      timeout: 30000,
       maxContentLength: Infinity,
       maxBodyLength: Infinity,
-      validateStatus: (status) => status < 500 // Don't throw on 4xx errors, let us handle them
+      validateStatus: (status) => status < 500
     });
 
-    console.log('Received response:', {
-      status: response.status,
-      statusText: response.statusText,
-      data: response.data
-    });
-
-    // Check if the response was successful
     if (response.status >= 400) {
-      console.error('Server returned error status:', response.status);
-      console.error('Error response data:', response.data);
       throw new Error(`Server error: ${response.status} - ${JSON.stringify(response.data)}`);
     }
-
-    console.log('Article created successfully:', response.data);
 
     // Return the response data as is since backend returns proper format
     return {
@@ -336,28 +217,7 @@ export const createArticle = async (articleData: ArticleCreate, file?: File): Pr
       }
     };
   } catch (error) {
-    console.error('Full error object:', error);
-    console.error('Error type:', typeof error);
-    console.error('Error constructor:', error?.constructor?.name);
-    
     if (axios.isAxiosError(error)) {
-      console.error('Axios Error Details:', {
-        message: error.message,
-        code: error.code,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        headers: error.response?.headers,
-        config: {
-          url: error.config?.url,
-          method: error.config?.method,
-          headers: error.config?.headers
-        },
-        hasResponse: !!error.response,
-        hasRequest: !!error.request
-      });
-      
-      // Try to extract error message from different possible formats
       let errorMessage = 'فشل في إنشاء المقال';
       
       if (error.response?.status === 400) {
@@ -374,7 +234,6 @@ export const createArticle = async (articleData: ArticleCreate, file?: File): Pr
         } else if (error.response.data.title) {
           errorMessage = error.response.data.title;
         } else if (error.response.data.errors) {
-          // Handle validation errors
           const validationErrors = Object.values(error.response.data.errors).flat().join(', ');
           errorMessage = `خطأ في التحقق: ${validationErrors}`;
         } else if (typeof error.response.data === 'object') {
@@ -386,52 +245,30 @@ export const createArticle = async (articleData: ArticleCreate, file?: File): Pr
       
       throw new Error(errorMessage);
     }
-    console.error('Non-Axios error:', error);
     throw error;
   }
 };
 
 export const getArticles = async (): Promise<ArticleAll[]> => {
   try {
-    console.log('🔄 Fetching articles from:', API_URL);
-    console.log('📍 BASE_API_URL:', BASE_API_URL);
-    console.log('🌐 Current hostname:', typeof window !== 'undefined' ? window.location.hostname : 'server');
-    
     const response = await api.get(API_URL, {
       headers: {
         'Cache-Control': 'no-cache',
         'Pragma': 'no-cache',
         'Accept': 'application/json'
       },
-      // Add timestamp to prevent caching
       params: {
         _t: Date.now()
       }
     });
     
-    console.log('✅ API Response Status:', response.status);
-    console.log('✅ Articles count:', Array.isArray(response.data) ? response.data.length : 'Not an array');
-    console.log('📦 Raw API response:', response.data);
-    
     if (!Array.isArray(response.data)) {
-      console.error('❌ Response is not an array:', typeof response.data);
       throw new Error('Invalid response format: expected array of articles');
     }
     
     return response.data;
   } catch (error) {
-    console.error('❌ Error in getArticles:', error);
     if (axios.isAxiosError(error)) {
-      console.error('Axios Error Details:', {
-        message: error.message,
-        code: error.code,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        url: API_URL,
-        baseUrl: BASE_API_URL,
-        responseData: error.response?.data
-      });
-      
       const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch articles';
       throw new Error(`فشل في الاتصال بالخادم: ${errorMessage}`);
     }
