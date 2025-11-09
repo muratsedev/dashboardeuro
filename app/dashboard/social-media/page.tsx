@@ -132,9 +132,6 @@ export default function SocialMediaPage() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  #
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   الاسم
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -146,7 +143,7 @@ export default function SocialMediaPage() {
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   الحالة
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   إجراءات
                 </th>
               </tr>
@@ -154,9 +151,6 @@ export default function SocialMediaPage() {
             <tbody className="bg-white divide-y divide-gray-200">
               {socialMedias.map((sm) => (
                 <tr key={sm.socialMediaId} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500">
-                    {sm.socialMediaId}
-                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right">
                     <span className="text-sm font-medium text-gray-900">{sm.iconName}</span>
                   </td>
@@ -198,8 +192,8 @@ export default function SocialMediaPage() {
                       {sm.isActivated ? 'مفعل' : 'معطل'}
                     </button>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <div className="flex gap-2 justify-end">
+                  <td className="px-6 py-4 whitespace-nowrap text-left">
+                    <div className="flex gap-2 justify-start">
                       <button
                         onClick={() => router.push(`/dashboard/social-media/${sm.socialMediaId}/edit`)}
                         className="text-indigo-600 hover:text-indigo-900"
