@@ -9,7 +9,8 @@ import {
   ArrowUpIcon,
   ArrowDownIcon,
   UsersIcon,
-  CheckCircleIcon
+  CheckCircleIcon,
+  ShareIcon
 } from '@heroicons/react/24/outline';
 
 interface DashboardStats {
@@ -135,7 +136,7 @@ export default function Dashboard() {
       {/* Quick Actions */}
       <div className="bg-white p-6 rounded-lg shadow-md mb-8">
         <h2 className="text-lg font-medium text-gray-900 mb-4 text-right">الإجراءات السريعة</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4">
           <Link href="/dashboard/articles/add">
             <div className="p-4 bg-indigo-50 rounded-lg text-center hover:bg-indigo-100 transition-colors">
               <DocumentTextIcon className="h-8 w-8 text-indigo-600 mx-auto" />
@@ -152,6 +153,12 @@ export default function Dashboard() {
             <div className="p-4 bg-indigo-50 rounded-lg text-center hover:bg-indigo-100 transition-colors">
               <ExclamationTriangleIcon className="h-8 w-8 text-indigo-600 mx-auto" />
               <span className="block mt-2 text-sm font-medium text-gray-900">خبر عاجل</span>
+            </div>
+          </Link>
+          <Link href="/dashboard/social-media">
+            <div className="p-4 bg-indigo-50 rounded-lg text-center hover:bg-indigo-100 transition-colors">
+              <ShareIcon className="h-8 w-8 text-indigo-600 mx-auto" />
+              <span className="block mt-2 text-sm font-medium text-gray-900">وسائل التواصل</span>
             </div>
           </Link>
           <Link href="/dashboard/users">

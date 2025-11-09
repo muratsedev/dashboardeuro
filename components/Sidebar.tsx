@@ -10,7 +10,8 @@ import {
   UsersIcon, 
   CogIcon,
   ChevronUpIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  ShareIcon
 } from '@heroicons/react/24/outline';
 
 export default function Sidebar() {
@@ -26,6 +27,7 @@ export default function Sidebar() {
     { name: 'وسوم', href: '/dashboard/tags', icon: TagIcon },
     { name: 'المقالات في الأعلى', href: '/dashboard/upper-articles', icon: ChevronUpIcon },
     { name: 'الأخبار العاجلة', href: '/dashboard/breaking-news', icon: ExclamationTriangleIcon },
+    { name: 'وسائل التواصل الاجتماعي', href: '/dashboard/social-media', icon: ShareIcon },
     { name: 'Users', href: '/dashboard/users', icon: UsersIcon },
     { name: 'Settings', href: '/dashboard/settings', icon: CogIcon },
   ];
