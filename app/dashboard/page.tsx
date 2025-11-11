@@ -8,9 +8,9 @@ import {
   ExclamationTriangleIcon, 
   ArrowUpIcon,
   ArrowDownIcon,
-  UsersIcon,
   CheckCircleIcon,
-  ShareIcon
+  ShareIcon,
+  StarIcon
 } from '@heroicons/react/24/outline';
 
 interface DashboardStats {
@@ -19,6 +19,7 @@ interface DashboardStats {
   totalBreakingNews: number;
   publishedArticles: number;
   recentArticles: number;
+  editorChoiceArticles: number;
 }
 
 export default function Dashboard() {
@@ -27,7 +28,8 @@ export default function Dashboard() {
     totalCategories: 0,
     totalBreakingNews: 0,
     publishedArticles: 0,
-    recentArticles: 0
+    recentArticles: 0,
+    editorChoiceArticles: 0
   });
   const [loading, setLoading] = useState(true);
 
@@ -54,31 +56,39 @@ export default function Dashboard() {
   const dashboardStats = [
     { 
       name: 'إجمالي المقالات', 
-      value: loading ? '...' : stats.totalArticles.toString(), 
+      value: loading ? '...' : (stats.totalArticles ?? 0).toString(), 
       icon: DocumentTextIcon, 
-      change: `+${stats.recentArticles}`, 
+      change: `+${stats.recentArticles ?? 0}`, 
       changeType: 'increase',
       changeLabel: 'خلال الشهر الماضي'
     },
     { 
+      name: 'المقالات المنشورة', 
+      value: loading ? '...' : (stats.publishedArticles ?? 0).toString(), 
+      icon: CheckCircleIcon, 
+      change: `+${Math.floor((stats.recentArticles ?? 0) * 0.8)}`, 
+      changeType: 'increase',
+      changeLabel: 'خلال الشهر الماضي'
+    },
+    { 
+      name: 'اختيار المحرر', 
+      value: loading ? '...' : (stats.editorChoiceArticles ?? 0).toString(), 
+      icon: StarIcon, 
+      change: '+0', 
+      changeType: 'neutral',
+      changeLabel: 'خلال الشهر الماضي'
+    },
+    { 
       name: 'إجمالي الأقسام', 
-      value: loading ? '...' : stats.totalCategories.toString(), 
+      value: loading ? '...' : (stats.totalCategories ?? 0).toString(), 
       icon: FolderIcon, 
       change: '+0', 
       changeType: 'neutral',
       changeLabel: 'خلال الشهر الماضي'
     },
     { 
-      name: 'المقالات المنشورة', 
-      value: loading ? '...' : stats.publishedArticles.toString(), 
-      icon: CheckCircleIcon, 
-      change: `+${Math.floor(stats.recentArticles * 0.8)}`, 
-      changeType: 'increase',
-      changeLabel: 'خلال الشهر الماضي'
-    },
-    { 
       name: 'الأخبار العاجلة', 
-      value: loading ? '...' : stats.totalBreakingNews.toString(), 
+      value: loading ? '...' : (stats.totalBreakingNews ?? 0).toString(), 
       icon: ExclamationTriangleIcon, 
       change: '+2', 
       changeType: 'increase',
@@ -93,7 +103,7 @@ export default function Dashboard() {
       </div>
       
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         {dashboardStats.map((stat) => (
           <div key={stat.name} className="bg-white p-6 rounded-lg shadow-md">
             <div className="flex items-center justify-between">
@@ -155,16 +165,16 @@ export default function Dashboard() {
               <span className="block mt-2 text-sm font-medium text-gray-900">خبر عاجل</span>
             </div>
           </Link>
+          <Link href="/dashboard/articles?filter=editorChoice">
+            <div className="p-4 bg-indigo-50 rounded-lg text-center hover:bg-indigo-100 transition-colors">
+              <StarIcon className="h-8 w-8 text-indigo-600 mx-auto" />
+              <span className="block mt-2 text-sm font-medium text-gray-900">اختيار المحرر</span>
+            </div>
+          </Link>
           <Link href="/dashboard/social-media">
             <div className="p-4 bg-indigo-50 rounded-lg text-center hover:bg-indigo-100 transition-colors">
               <ShareIcon className="h-8 w-8 text-indigo-600 mx-auto" />
               <span className="block mt-2 text-sm font-medium text-gray-900">وسائل التواصل</span>
-            </div>
-          </Link>
-          <Link href="/dashboard/users">
-            <div className="p-4 bg-indigo-50 rounded-lg text-center hover:bg-indigo-100 transition-colors">
-              <UsersIcon className="h-8 w-8 text-indigo-600 mx-auto" />
-              <span className="block mt-2 text-sm font-medium text-gray-900">المستخدمين</span>
             </div>
           </Link>
         </div>

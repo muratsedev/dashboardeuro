@@ -265,6 +265,32 @@ export const getArticle = async (id: string): Promise<ArticleAll> => {
   return response.data;
 };
 
+export const getEditorChoice = async (): Promise<ArticleAll[]> => {
+  try {
+    const response = await api.get(`${API_URL}/EditorChoice`, {
+      headers: {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
+        'Accept': 'application/json'
+      },
+      params: {
+        _t: Date.now()
+      }
+    });
+    
+    if (!Array.isArray(response.data)) {
+      throw new Error('Invalid response format: expected array of articles');
+    }
+    
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch editor choice articles';
+      throw new Error(`فشل في الاتصال بالخادم: ${errorMessage}`);
+    }
+    throw error;
+  }
+};
 
 export const createTodo = async (data: { articleTitle: string; categoryId: number }): Promise<ArticleAll> => {
   try {

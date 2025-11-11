@@ -37,6 +37,7 @@ export default function EditArticle({ params }: { params: Promise<{ id: string }
     isPublished: false,
     facebook: false,
     twitter: false,
+    editorChoice: false,
     categoryId: {
       id: 0,
       name: "",
@@ -131,6 +132,7 @@ export default function EditArticle({ params }: { params: Promise<{ id: string }
           isPublished: Boolean(articleData.isPublished),
           facebook: Boolean(articleData.facebook),
           twitter: Boolean(articleData.twitter),
+          editorChoice: Boolean(articleData.editorChoice),
           categoryId: categoryId,
           tagId: articleData.tagId || undefined,
           podcastTypeId: articleData.podcastTypeId || undefined,
@@ -458,6 +460,15 @@ export default function EditArticle({ params }: { params: Promise<{ id: string }
                 <label className="inline-flex items-center">
                   <input type="checkbox" name="twitter" checked={formData.twitter || false} onChange={handleInputChange} className="form-checkbox h-4 w-4 text-custom-green" />
                   <span className="mr-2 text-sm sm:text-base">تويتر</span>
+                </label>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 text-right mb-3">اختيار المحرر</label>
+              <div className="space-y-2">
+                <label className="inline-flex items-center">
+                  <input type="checkbox" name="editorChoice" checked={formData.editorChoice || false} onChange={handleInputChange} className="form-checkbox h-4 w-4 text-custom-green" />
+                  <span className="mr-2 text-sm sm:text-base">اختيار المحرر</span>
                 </label>
               </div>
             </div>

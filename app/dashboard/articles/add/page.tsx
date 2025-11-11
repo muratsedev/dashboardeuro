@@ -35,6 +35,7 @@ export default function AddArticle() {
     isPublished: false,
     facebook: false,
     twitter: false,
+    editorChoice: false,
     categoryId: {
       id: 0,
       name: "",
@@ -617,6 +618,24 @@ export default function AddArticle() {
                   className="form-checkbox h-4 w-4 text-custom-green"
                 />
                 <span className="mr-2">تويتر</span>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 text-right mb-3">
+              اختيار المحرر
+            </label>
+            <div className="space-y-2">
+              <label className="inline-flex items-center">
+                <input
+                  type="checkbox"
+                  name="editorChoice"
+                  checked={formData.editorChoice || false}
+                  onChange={handleInputChange}
+                  className="form-checkbox h-4 w-4 text-custom-green"
+                />
+                <span className="mr-2">اختيار المحرر</span>
               </label>
             </div>
           </div>

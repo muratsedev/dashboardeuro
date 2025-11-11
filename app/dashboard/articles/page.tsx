@@ -19,8 +19,10 @@ export default function Articles() {
   const [articles, setArticles] = useState<ArticleAll[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [sortField, setSortField] = useState<'articleTitle' | 'isPublished' | 'createdDate'>('createdDate');
+  const [sortField, setSortField] = useState<'articleTitle' | 'isPublished' | 'createdDate' | 'categoryName' | 'editorChoice'>('createdDate');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const articlesPerPage = 20;
 
   const router = useRouter();
 
@@ -45,7 +47,7 @@ export default function Articles() {
     fetchArticles();
   }, []);
 
-  const handleSort = (field: 'articleTitle' | 'isPublished' | 'createdDate') => {
+  const handleSort = (field: 'articleTitle' | 'isPublished' | 'createdDate' | 'categoryName' | 'editorChoice') => {
     if (sortField === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
@@ -64,12 +66,70 @@ export default function Articles() {
         return sortDirection === 'asc'
           ? Number(a.isPublished) - Number(b.isPublished)
           : Number(b.isPublished) - Number(a.isPublished);
+      } else if (sortField === 'categoryName') {
+        const categoryA = a.categoryName || a.category?.name || '';
+        const categoryB = b.categoryName || b.category?.name || '';
+        return sortDirection === 'asc'
+          ? categoryA.localeCompare(categoryB)
+          : categoryB.localeCompare(categoryA);
+      } else if (sortField === 'editorChoice') {
+        const editorChoiceA = a.editorChoice ? 1 : 0;
+        const editorChoiceB = b.editorChoice ? 1 : 0;
+        return sortDirection === 'asc'
+          ? editorChoiceA - editorChoiceB
+          : editorChoiceB - editorChoiceA;
       } else {
         return sortDirection === 'asc'
           ? (a.createdDate ? new Date(a.createdDate).getTime() : 0) - (b.createdDate ? new Date(b.createdDate).getTime() : 0)
           : (b.createdDate ? new Date(b.createdDate).getTime() : 0) - (a.createdDate ? new Date(a.createdDate).getTime() : 0);
       }
     });
+  };
+
+  // Get current articles for pagination
+  const sortedArticles = getSortedArticles();
+  const totalPages = Math.ceil(sortedArticles.length / articlesPerPage);
+  const indexOfLastArticle = currentPage * articlesPerPage;
+  const indexOfFirstArticle = indexOfLastArticle - articlesPerPage;
+  const currentArticles = sortedArticles.slice(indexOfFirstArticle, indexOfLastArticle);
+
+  // Change page
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  // Generate page numbers array
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxPagesToShow = 5;
+    
+    if (totalPages <= maxPagesToShow) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pageNumbers.push(i);
+        }
+        pageNumbers.push('...');
+        pageNumbers.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pageNumbers.push(1);
+        pageNumbers.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pageNumbers.push(i);
+        }
+      } else {
+        pageNumbers.push(1);
+        pageNumbers.push('...');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pageNumbers.push(i);
+        }
+        pageNumbers.push('...');
+        pageNumbers.push(totalPages);
+      }
+    }
+    
+    return pageNumbers;
   };
 
   if (isLoading) return <div>Loading...</div>;
@@ -202,8 +262,6 @@ export default function Articles() {
     );
   }
 
-  const sortedArticles = getSortedArticles();
-
   return (
     <div className="container mx-auto">
       <Toaster />
@@ -234,27 +292,35 @@ export default function Articles() {
                 <tr>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                     onClick={() => handleSort('articleTitle')}
                   >
                     العنوان {sortField === 'articleTitle' && (sortDirection === 'asc' ? '↑' : '↓')}
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                    onClick={() => handleSort('categoryName')}
                   >
-                    التصنيف
+                    التصنيف {sortField === 'categoryName' && (sortDirection === 'asc' ? '↑' : '↓')}
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                     onClick={() => handleSort('isPublished')}
                   >
                     الحالة {sortField === 'isPublished' && (sortDirection === 'asc' ? '↑' : '↓')}
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                    onClick={() => handleSort('editorChoice')}
+                  >
+                    اختيار المحرر {sortField === 'editorChoice' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                     onClick={() => handleSort('createdDate')}
                   >
                     تاريخ الإنشاء {sortField === 'createdDate' && (sortDirection === 'asc' ? '↑' : '↓')}
@@ -268,7 +334,7 @@ export default function Articles() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {sortedArticles.map((article) => {
+                {currentArticles.map((article) => {
                   // Debug logging for each article
                   console.log(`Article: ${article.articleTitle}, isPublished: ${article.isPublished}, type: ${typeof article.isPublished}`);
                   
@@ -297,6 +363,15 @@ export default function Articles() {
                       >
                         {article.isPublished ? "منشورة" : "مسودة"}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                      {article.editorChoice ? (
+                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                          ✓ اختيار المحرر
+                        </span>
+                      ) : (
+                        <span className="text-gray-400 text-xs">-</span>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">
                       {article.createdDate ? new Date(article.createdDate).toLocaleDateString("en-GB", {
@@ -335,6 +410,105 @@ export default function Articles() {
               </tbody>
             </table>
           </div>
+          
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+              <div className="flex-1 flex justify-between sm:hidden">
+                <button
+                  onClick={() => paginate(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                    currentPage === 1
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : 'bg-white text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  السابق
+                </button>
+                <button
+                  onClick={() => paginate(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className={`ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                    currentPage === totalPages
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : 'bg-white text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  التالي
+                </button>
+              </div>
+              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm text-gray-700">
+                    عرض{' '}
+                    <span className="font-medium">{indexOfFirstArticle + 1}</span>
+                    {' '}إلى{' '}
+                    <span className="font-medium">
+                      {Math.min(indexOfLastArticle, sortedArticles.length)}
+                    </span>
+                    {' '}من{' '}
+                    <span className="font-medium">{sortedArticles.length}</span>
+                    {' '}مقال
+                  </p>
+                </div>
+                <div>
+                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                    <button
+                      onClick={() => paginate(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 text-sm font-medium ${
+                        currentPage === 1
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                          : 'bg-white text-gray-500 hover:bg-gray-50'
+                      }`}
+                    >
+                      <span className="sr-only">السابق</span>
+                      <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                    {getPageNumbers().map((pageNumber, index) => (
+                      pageNumber === '...' ? (
+                        <span
+                          key={`ellipsis-${index}`}
+                          className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"
+                        >
+                          ...
+                        </span>
+                      ) : (
+                        <button
+                          key={pageNumber}
+                          onClick={() => paginate(pageNumber as number)}
+                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                            currentPage === pageNumber
+                              ? 'z-10 bg-green-50 border-green-500 text-green-600'
+                              : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                          }`}
+                        >
+                          {pageNumber}
+                        </button>
+                      )
+                    ))}
+                    <button
+                      onClick={() => paginate(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 text-sm font-medium ${
+                        currentPage === totalPages
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                          : 'bg-white text-gray-500 hover:bg-gray-50'
+                      }`}
+                    >
+                      <span className="sr-only">التالي</span>
+                      <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                  </nav>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

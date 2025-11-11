@@ -6,6 +6,7 @@ export interface ArticleCreate {
   isPublished: boolean;
   facebook?: boolean;
   twitter?: boolean;
+  editorChoice?: boolean;
   createdDate?: Date;
   
   categoryId: {
@@ -27,6 +28,7 @@ export interface ArticleAll {
   isPublished: boolean;
   facebook?: boolean;
   twitter?: boolean;
+  editorChoice?: boolean;
   createdDate?: Date;
   updatedDate?: Date;
   categoryId: number;
