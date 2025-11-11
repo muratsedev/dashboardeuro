@@ -59,6 +59,9 @@ export const updateArticle = async (id: string, articleData: ArticleCreate, file
     if (articleData.isPublished !== undefined) {
       formData.append('isPublished', articleData.isPublished.toString());
     }
+    if (articleData.editorChoice !== undefined) {
+      formData.append('editorChoice', articleData.editorChoice.toString());
+    }
     if (articleData.facebook !== undefined) {
       formData.append('facebook', articleData.facebook.toString());
     }
@@ -153,6 +156,9 @@ export const createArticle = async (articleData: ArticleCreate, file?: File): Pr
     // Append additional fields if they exist in ArticleCreate
     if (articleData.isPublished !== undefined) {
       formData.append('isPublished', articleData.isPublished.toString());
+    }
+    if (articleData.editorChoice !== undefined) {
+      formData.append('editorChoice', articleData.editorChoice.toString());
     }
     if (articleData.facebook !== undefined) {
       formData.append('facebook', articleData.facebook.toString());
