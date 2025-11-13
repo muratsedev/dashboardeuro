@@ -383,6 +383,7 @@ export const updateCategory = async (id: number, categoryData: Partial<CategoryA
     console.log('Category ID:', id);
     console.log('Payload:', payload);
     console.log('IsActivated in payload:', payload.isActivated);
+    console.log('IsShowInFooter in payload:', payload.isShowInFooter);
     
     const response = await axios.put(`${Categories_API_URL}/${id}`, payload);
     console.log('Update response:', response.data);

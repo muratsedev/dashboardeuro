@@ -9,6 +9,8 @@ interface CategoryTableProps {
 }
 
 export default function CategoryTable({ categories, onEdit, onDelete }: CategoryTableProps) {
+  console.log('CategoryTable rendering with categories:', categories);
+  
   if (categories.length === 0) {
     return (
       <EmptyState
@@ -38,49 +40,57 @@ export default function CategoryTable({ categories, onEdit, onDelete }: Category
 
   return (
     <div className="bg-white shadow-md rounded-lg overflow-hidden">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">اسم التصنيف</th>
-            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الرابط المختصر</th>
-            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الحالة</th>
-            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الإجراءات</th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {categories.map((category) => (
-            <tr key={category.id}>
-              <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">{category.name}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500">{category.categorySlug}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${category.isActivated ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                  {category.isActivated ? 'نشط' : 'غير نشط'}
-                </span>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <div className="flex items-center justify-end gap-3">
-                  <button 
-                    onClick={() => onEdit(category.id)} 
-                    className="text-custom-green hover:text-custom-green-dark p-1 rounded-full hover:bg-custom-green-50 transition-colors" 
-                    aria-label="تعديل التصنيف" 
-                    title="تعديل"
-                  >
-                    <PencilIcon className="h-5 w-5" />
-                  </button>
-                  <button 
-                    onClick={() => onDelete(category.id)} 
-                    className="text-red-600 hover:text-red-900 p-1 rounded-full hover:bg-red-50 transition-colors" 
-                    aria-label="حذف التصنيف" 
-                    title="حذف"
-                  >
-                    <TrashIcon className="h-5 w-5" />
-                  </button>
-                </div>
-              </td>
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200 table-fixed">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="w-1/4 px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">اسم التصنيف</th>
+              <th className="w-1/4 px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الرابط المختصر</th>
+              <th className="w-1/6 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">الحالة</th>
+              <th className="w-1/5 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">عرض في التذييل</th>
+              <th className="w-1/6 px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">الإجراءات</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {categories.map((category) => (
+              <tr key={category.id} className="hover:bg-gray-50">
+                <td className="w-1/4 px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 font-medium">{category.name || 'غير محدد'}</td>
+                <td className="w-1/4 px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500">{category.categorySlug || 'غير محدد'}</td>
+                <td className="w-1/6 px-6 py-4 whitespace-nowrap text-center text-sm">
+                  <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${category.isActivated ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                    {category.isActivated ? 'نشط' : 'غير نشط'}
+                  </span>
+                </td>
+                <td className="w-1/5 px-6 py-4 whitespace-nowrap text-center text-sm">
+                  <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${category.isShowInFooter ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}>
+                    {category.isShowInFooter ? 'معروض' : 'غير معروض'}
+                  </span>
+                </td>
+                <td className="w-1/6 px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                  <div className="flex items-center justify-center gap-2">
+                    <button 
+                      onClick={() => onEdit(category.id)} 
+                      className="text-indigo-600 hover:text-indigo-900 p-2 rounded-md hover:bg-indigo-50 transition-colors" 
+                      aria-label="تعديل التصنيف" 
+                      title="تعديل"
+                    >
+                      <PencilIcon className="h-4 w-4" />
+                    </button>
+                    <button 
+                      onClick={() => onDelete(category.id)} 
+                      className="text-red-600 hover:text-red-900 p-2 rounded-md hover:bg-red-50 transition-colors" 
+                      aria-label="حذف التصنيف" 
+                      title="حذف"
+                    >
+                      <TrashIcon className="h-4 w-4" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

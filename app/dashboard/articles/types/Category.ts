@@ -3,4 +3,5 @@ export interface CategoryAll {
   name: string;
   categorySlug: string;
   isActivated: boolean;
+  isShowInFooter?: boolean;
 }

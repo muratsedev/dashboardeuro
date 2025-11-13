@@ -9,7 +9,8 @@ export default function AddCategory() {
   const [formData, setFormData] = useState({
     name: '',
     categorySlug: '',
-    isActivated: true
+    isActivated: true,
+    isShowInFooter: false
   });
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -172,7 +173,7 @@ export default function AddCategory() {
                   type="checkbox"
                   id="isActivated"
                   name="isActivated"
-                  checked={formData.isActivated}
+                  checked={!!formData.isActivated}
                   onChange={() => {}} // Controlled by the toggle above
                   className="sr-only"
                   aria-label="حالة التصنيف"
@@ -180,6 +181,65 @@ export default function AddCategory() {
               </div>
             </div>
           </div>
+          
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3 text-right">
+                عرض في التذييل
+              </label>
+              <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors" dir="rtl">
+                <div className="flex items-center">
+                  <div className="flex flex-col text-right">
+                    <span id="footer-toggle-label" className="text-sm font-medium text-gray-900 mb-1">
+                      إظهار التصنيف في التذييل
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {formData.isShowInFooter ? 'سيظهر التصنيف في تذييل الموقع' : 'لن يظهر التصنيف في التذييل'}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 min-h-[40px]">
+                  <span className={`text-sm font-medium whitespace-nowrap mr-3 ${formData.isShowInFooter ? 'text-green-600' : 'text-gray-500'}`}>
+                    {formData.isShowInFooter ? 'معروض' : 'غير معروض'}
+                  </span>
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    aria-labelledby="footer-toggle-label"
+                    title={formData.isShowInFooter ? 'إلغاء عرض التصنيف في التذييل' : 'عرض التصنيف في التذييل'}
+                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+                      formData.isShowInFooter ? 'bg-indigo-600' : 'bg-gray-200'
+                    }`}
+                    onClick={() => {
+                      const newValue = !formData.isShowInFooter;
+                      setFormData(prev => ({ ...prev, isShowInFooter: newValue }));
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        const newValue = !formData.isShowInFooter;
+                        setFormData(prev => ({ ...prev, isShowInFooter: newValue }));
+                      }
+                    }}
+                  >
+                    <span className="sr-only">تبديل عرض التصنيف في التذييل</span>
+                    <span
+                      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-lg transition-transform duration-200 ease-in-out ${
+                        formData.isShowInFooter ? 'translate-x-5' : 'translate-x-0'
+                      }`}
+                    />
+                  </div>
+                  <input
+                    type="checkbox"
+                    id="isShowInFooter"
+                    name="isShowInFooter"
+                    checked={!!formData.isShowInFooter}
+                    onChange={() => {}} // Controlled by the toggle above
+                    className="sr-only"
+                    aria-label="عرض في التذييل"
+                  />
+                </div>
+              </div>
+            </div>
           
           <div className="flex justify-end">
             <button
