@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  color-scheme: dark;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Ensure text visibility in dark mode */
+html.dark p,
+html.dark div,
+html.dark span,
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark h4,
+html.dark h5,
+html.dark h6 {
+  color: inherit;
+}
+
+/* CKEditor Styles */
+.ck-editor__editable {
+  min-height: 300px;
+  direction: rtl !important;
+}
+
+.ck.ck-editor__editable_inline {
+  padding: 0 1rem !important;
+}
+
+.ck.ck-editor__editable_inline > :first-child {
+  margin-top: 0.5rem !important;
+}
+
+.ck.ck-toolbar {
+  direction: rtl !important;
+}
+
+/* CKEditor dark mode support */
+html.dark .ck-editor__editable {
+  background-color: #1f2937;
+  color: #ededed;
+}
+
+html.dark .ck.ck-toolbar {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+html.dark .ck.ck-button {
+  color: #ededed;
+}
+
+html.dark .ck.ck-button:hover {
+  background-color: #374151;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
