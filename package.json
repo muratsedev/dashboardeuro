@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint app components lib",
     "clean": "rimraf .next out dist node_modules/.cache",
     "clean:full": "rimraf .next out dist node_modules/.cache && npm install"
   },
