@@ -11,7 +11,7 @@ export function getApiUrl(): string {
   }
   
   // Default to cloud production API
-  return 'https://eennback-002-site1.atempurl.com';
+  return 'https://euronews-001-site1.stempurl.com';
 }
 
 /**

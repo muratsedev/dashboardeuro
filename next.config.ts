@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
       allowedOrigins: [
-        'eennback-002-site1.atempurl.com',
+        'euronews-001-site1.stempurl.com',
         'localhost:7065',
         'localhost:7066'
       ],
@@ -62,7 +62,7 @@ const nextConfig: NextConfig = {
       // Production/Cloud configuration
       {
         protocol: 'https',
-        hostname: 'eennback-002-site1.atempurl.com',
+        hostname: 'euronews-001-site2.stempurl.com',
         pathname: '/uploads/**',
       },
       // Development configuration - HTTPS (local)
@@ -82,7 +82,7 @@ const nextConfig: NextConfig = {
       // Production configuration - your cloud API domain
       {
         protocol: 'https',
-        hostname: 'eennback-002-site1.atempurl.com',
+        hostname: 'euronews-001-site2.stempurl.com',
         pathname: '/uploads/**',
       },
       // Fallback for other HTTPS domains
