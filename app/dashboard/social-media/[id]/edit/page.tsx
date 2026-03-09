@@ -59,6 +59,7 @@ export default function EditSocialMediaPage() {
   useEffect(() => {
     if (id) {
       fetchSocialMedia();
+  import { getImageSrc } from '@/lib/imageHelpers';
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
@@ -214,10 +215,7 @@ export default function EditSocialMediaPage() {
                   </button>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img 
-                    src={formData.imagePath.startsWith('http') 
-                      ? formData.imagePath 
-                      : getApiEndpoint(`/${formData.imagePath}`)
-                    } 
+                      src={getImageSrc(formData.imagePath)} 
                     alt="Current icon" 
                     className="w-16 h-16 object-contain border rounded p-2"
                   />

@@ -65,6 +65,11 @@ const nextConfig: NextConfig = {
         hostname: 'euronews-001-site1.stempurl.com',
         pathname: '/uploads/**',
       },
+        {
+          protocol: 'https',
+          hostname: 'euronews-001-site2.stempurl.com',
+          pathname: '/uploads/**',
+        },
       // Development configuration - HTTPS (local)
       {
         protocol: 'https',
@@ -93,6 +98,22 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  
+    // Proxy image requests to avoid CORS and routing issues
+    async rewrites() {
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://euronews-001-site1.stempurl.com';
+      return [
+        {
+          source: '/api/backend/:path*',
+          destination: `${backendUrl}/api/:path*`,
+        },
+        // Proxy all image requests through site1 API (which has access to site2 files)
+        {
+          source: '/backend-images/:path*',
+          destination: `${backendUrl}/:path*`,
+        },
+      ];
+    },
   
   // Performance optimizations
   poweredByHeader: false,

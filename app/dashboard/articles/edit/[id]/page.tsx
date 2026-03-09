@@ -56,6 +56,7 @@ export default function EditArticle({ params }: { params: Promise<{ id: string }
         setLoading(true);
         // Fetch article data
         const articleUrl = `${getApiUrl()}/api/Articles/${id}`;
+        import { getImageSrc } from "../../../../../lib/imageHelpers";
         
         const articleResponse = await fetch(articleUrl, {
           method: 'GET',
@@ -148,14 +149,7 @@ export default function EditArticle({ params }: { params: Promise<{ id: string }
               imageUrl = imageUrl.startsWith('/') 
                 ? `${apiUrl}${imageUrl}` 
                 : `${apiUrl}/${imageUrl}`;
-            }
-            setCurrentImage(imageUrl);
-          } catch (error) {
-            console.error('Error setting current image:', error);
-            setCurrentImage(null);
-          }
-        }
-      } catch (error) {
+                    setCurrentImage(getImageSrc(articleData.imagePath));
         console.error("Error fetching data:", error);
         toast.error("فشل في تحميل البيانات", {
           position: "bottom-center",
