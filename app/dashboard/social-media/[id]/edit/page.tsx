@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { ArrowRightIcon, PhotoIcon } from '@heroicons/react/24/outline';
 import { getApiEndpoint } from '@/lib/api-config';
+import { getImageSrc } from '@/lib/imageHelpers';
 import { toast } from 'react-hot-toast';
 
 export default function EditSocialMediaPage() {
@@ -59,7 +60,6 @@ export default function EditSocialMediaPage() {
   useEffect(() => {
     if (id) {
       fetchSocialMedia();
-  import { getImageSrc } from '@/lib/imageHelpers';
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);

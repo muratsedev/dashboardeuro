@@ -17,6 +17,7 @@ import Image from "next/image";
 import { getCategories, getTags, getPodcastTypes, getUpperArticles, getArticles, updateArticle } from "../../lib/api";
 import RichTextEditor from "../../../../../components/RichTextEditor";
 import { getApiUrl } from "../../../../../lib/api-config";
+import { getImageSrc } from "../../../../../lib/imageHelpers";
 
 export default function EditArticle({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -56,7 +57,6 @@ export default function EditArticle({ params }: { params: Promise<{ id: string }
         setLoading(true);
         // Fetch article data
         const articleUrl = `${getApiUrl()}/api/Articles/${id}`;
-        import { getImageSrc } from "../../../../../lib/imageHelpers";
         
         const articleResponse = await fetch(articleUrl, {
           method: 'GET',
@@ -141,15 +141,13 @@ export default function EditArticle({ params }: { params: Promise<{ id: string }
         // Set current image if exists
         if (articleData.imagePath) {
           try {
-            // Handle both absolute and relative paths
-            let imageUrl = articleData.imagePath;
-            if (!imageUrl.startsWith('http')) {
-              // If it's a relative path, prepend the base URL
-              const apiUrl = getApiUrl();
-              imageUrl = imageUrl.startsWith('/') 
-                ? `${apiUrl}${imageUrl}` 
-                : `${apiUrl}/${imageUrl}`;
-                    setCurrentImage(getImageSrc(articleData.imagePath));
+            setCurrentImage(getImageSrc(articleData.imagePath));
+          } catch (error) {
+            console.error('Error setting current image:', error);
+            setCurrentImage(null);
+          }
+        }
+      } catch (error) {
         console.error("Error fetching data:", error);
         toast.error("فشل في تحميل البيانات", {
           position: "bottom-center",
