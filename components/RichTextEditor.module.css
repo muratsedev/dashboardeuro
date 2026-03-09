@@ -1,0 +1,4 @@
+.editor textarea {
+  direction: rtl;
+  unicode-bidi: bidi-override;
+}
