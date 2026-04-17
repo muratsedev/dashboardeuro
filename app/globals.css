@@ -7,11 +7,8 @@
   --foreground: #171717;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: light;
 }
 
 html.dark {
@@ -45,6 +42,17 @@ html.dark h6 {
   direction: rtl !important;
 }
 
+/* Keep CKEditor content readable in light mode */
+.ck.ck-editor__editable_inline {
+  background-color: #ffffff;
+  color: #111827;
+}
+
+.ck.ck-editor__editable_inline.ck-placeholder::before {
+  color: #6b7280 !important;
+  opacity: 1;
+}
+
 .ck.ck-editor__editable_inline {
   padding: 0 1rem !important;
 }
@@ -74,10 +82,4 @@ html.dark .ck.ck-button {
 
 html.dark .ck.ck-button:hover {
   background-color: #374151;
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
 }

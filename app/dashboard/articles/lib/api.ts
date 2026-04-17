@@ -41,7 +41,7 @@ const BASE_API_URL = getApiUrl();
 const API_URL = `${BASE_API_URL}/api/Articles`;
 const Categories_API_URL = `${BASE_API_URL}/api/Categories`;
 const Tags_API_URL = `${BASE_API_URL}/api/Tags`;
-const PodcastTypes_API_URL = `${BASE_API_URL}/api/PodcastTypes`;
+const PodcastTypes_API_URL = `${BASE_API_URL}/api/Podcasts`;
 const UpperArticles_API_URL = `${BASE_API_URL}/api/UpperArticles`;
 
 export const updateArticle = async (id: string, articleData: ArticleCreate, file?: File): Promise<ArticleAll> => {
@@ -502,7 +502,15 @@ export const deleteTag = async (id: number): Promise<void> => {
 export const getPodcastTypes = async (): Promise<PodcastType[]> => {
   try {
     const response = await api.get(PodcastTypes_API_URL);
-    return response.data;
+    const items = Array.isArray(response.data) ? response.data : [];
+
+    // Backend returns podcastTitle/podcastLink while UI expects podcastName.
+    return items.map((item: any) => ({
+      podcastId: item.podcastId,
+      podcastName: item.podcastName ?? item.podcastTitle ?? '',
+      podcastLink: item.podcastLink,
+      isPublished: item.isPublished,
+    }));
   } catch (error) {
     console.error('Error fetching podcast types:', error);
     if (axios.isAxiosError(error)) {
