@@ -24,6 +24,12 @@ const nextConfig: NextConfig = {
     },
   },
   webpack: (config, { isServer, dev }) => {
+    config.resolve.alias = {
+      ...(config.resolve.alias || {}),
+      axios: path.join(process.cwd(), 'lib/shims/axios.ts'),
+      'react-hot-toast': path.join(process.cwd(), 'lib/shims/react-hot-toast.tsx'),
+    };
+
     // CKEditor compatibility fixes
     if (!isServer) {
       config.resolve.fallback = {

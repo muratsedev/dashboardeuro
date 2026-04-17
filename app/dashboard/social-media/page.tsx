@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { PencilIcon, TrashIcon, PlusIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 import { getApiEndpoint } from '@/lib/api-config';
+import { getImageSrc } from '@/lib/imageHelpers';
 import { toast } from 'react-hot-toast';
 
 interface SocialMedia {
@@ -158,7 +159,7 @@ export default function SocialMediaPage() {
                     {sm.imagePath ? (
                       <div className="relative w-10 h-10">
                         <Image
-                          src={sm.imagePath.startsWith('http') ? sm.imagePath : getApiEndpoint(`/${sm.imagePath}`)}
+                          src={getImageSrc(sm.imagePath)}
                           alt={sm.iconName}
                           fill
                           className="object-contain"

@@ -1,13 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { Tab } from '@headlessui/react';
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
 }
 
+const settingsTabs = ['General', 'User Profile', 'Notifications'] as const;
+
 export default function Settings() {
+  const [activeTab, setActiveTab] = useState<(typeof settingsTabs)[number]>('General');
   const [generalSettings, setGeneralSettings] = useState({
     siteName: 'My Dashboard',
     siteDescription: 'A NextJS dashboard with RTL support',
@@ -79,27 +81,30 @@ export default function Settings() {
       </div>
       
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <Tab.Group>
-          <Tab.List className="flex p-1 space-x-1 bg-gray-100 rtl:space-x-reverse">
-            {['General', 'User Profile', 'Notifications'].map((category) => (
-              <Tab
-                key={category}
-                className={({ selected }) =>
-                  classNames(
+        <div>
+          <div className="flex p-1 space-x-1 bg-gray-100 rtl:space-x-reverse" role="tablist" aria-label="Settings tabs">
+            {settingsTabs.map((category) => {
+              const isSelected = activeTab === category;
+
+              return (
+                <button
+                  key={category}
+                  type="button"
+                  onClick={() => setActiveTab(category)}
+                  className={classNames(
                     'w-full py-2.5 text-sm font-medium leading-5 text-gray-700',
                     'focus:outline-none',
-                    selected
-                      ? 'bg-white shadow'
-                      : 'hover:bg-gray-200'
-                  )
-                }
-              >
-                {category}
-              </Tab>
-            ))}
-          </Tab.List>
-          <Tab.Panels className="p-6">
-            <Tab.Panel>
+                    isSelected ? 'bg-white shadow' : 'hover:bg-gray-200'
+                  )}
+                  role="tab"
+                >
+                  {category}
+                </button>
+              );
+            })}
+          </div>
+          <div className="p-6">
+            {activeTab === 'General' && (
               <form onSubmit={handleSaveSettings} className="space-y-6 text-right">
                 <div>
                   <label htmlFor="siteName" className="block text-sm font-medium text-gray-700">
@@ -190,9 +195,9 @@ export default function Settings() {
                   </button>
                 </div>
               </form>
-            </Tab.Panel>
-            
-            <Tab.Panel>
+            )}
+
+            {activeTab === 'User Profile' && (
               <form onSubmit={handleSaveSettings} className="space-y-6 text-right">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700">
@@ -280,9 +285,9 @@ export default function Settings() {
                   </button>
                 </div>
               </form>
-            </Tab.Panel>
-            
-            <Tab.Panel>
+            )}
+
+            {activeTab === 'Notifications' && (
               <form onSubmit={handleSaveSettings} className="space-y-6 text-right">
                 <div className="space-y-4">
                   <div className="flex items-center justify-end">
@@ -352,9 +357,9 @@ export default function Settings() {
                   </button>
                 </div>
               </form>
-            </Tab.Panel>
-          </Tab.Panels>
-        </Tab.Group>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

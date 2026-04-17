@@ -1,8 +1,7 @@
 'use client';
 
-import { Fragment } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react';
 import { Bars3Icon, BellIcon } from '@heroicons/react/24/outline';
 
 interface HeaderProps {
@@ -11,8 +10,33 @@ interface HeaderProps {
 
 export default function Header({ onMenuToggle }: HeaderProps) {
   const router = useRouter();
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handlePointerDown = (event: MouseEvent) => {
+      if (!profileMenuRef.current?.contains(event.target as Node)) {
+        setIsProfileMenuOpen(false);
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsProfileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, []);
 
   const handleLogout = () => {
+    setIsProfileMenuOpen(false);
     localStorage.removeItem('isLoggedIn');
     router.push('/');
   };
@@ -51,64 +75,52 @@ export default function Header({ onMenuToggle }: HeaderProps) {
             </button>
 
             {/* Profile dropdown */}
-            <Menu as="div" className="relative">
-              <div>
-                <MenuButton className="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+            <div className="relative" ref={profileMenuRef}>
+              <button
+                type="button"
+                onClick={() => setIsProfileMenuOpen((current) => !current)}
+                className="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                aria-haspopup="menu"
+              >
                   <span className="sr-only">فتح قائمة المستخدم</span>
                   <div className="h-8 w-8 rounded-full bg-green-600 flex items-center justify-center text-white">
                     A
                   </div>
-                </MenuButton>
-              </div>
-              <Transition
-                as={Fragment}
-                enter="transition ease-out duration-100"
-                enterFrom="transform opacity-0 scale-95"
-                enterTo="transform opacity-100 scale-100"
-                leave="transition ease-in duration-75"
-                leaveFrom="transform opacity-100 scale-100"
-                leaveTo="transform opacity-0 scale-95"
+              </button>
+              <div
+                className={`origin-top-left absolute left-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 transition duration-100 ${
+                  isProfileMenuOpen
+                    ? 'pointer-events-auto scale-100 opacity-100'
+                    : 'pointer-events-none scale-95 opacity-0'
+                }`}
+                role="menu"
               >
-                <MenuItems className="origin-top-left absolute left-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-                  <MenuItem>
-                    {({ active }) => (
-                      <a
-                        href="#"
-                        className={`${
-                          active ? 'bg-gray-100' : ''
-                        } block px-4 py-2 text-sm text-gray-700 text-right`}
-                      >
-                        الملف الشخصي
-                      </a>
-                    )}
-                  </MenuItem>
-                  <MenuItem>
-                    {({ active }) => (
-                      <a
-                        href="#"
-                        className={`${
-                          active ? 'bg-gray-100' : ''
-                        } block px-4 py-2 text-sm text-gray-700 text-right`}
-                      >
-                        الإعدادات
-                      </a>
-                    )}
-                  </MenuItem>
-                  <MenuItem>
-                    {({ active }) => (
-                      <button
-                        onClick={handleLogout}
-                        className={`${
-                          active ? 'bg-gray-100' : ''
-                        } block w-full text-right px-4 py-2 text-sm text-gray-700`}
-                      >
-                        تسجيل الخروج
-                      </button>
-                    )}
-                  </MenuItem>
-                </MenuItems>
-              </Transition>
-            </Menu>
+                <a
+                  href="#"
+                  className="block px-4 py-2 text-sm text-gray-700 text-right hover:bg-gray-100"
+                  role="menuitem"
+                  onClick={() => setIsProfileMenuOpen(false)}
+                >
+                  الملف الشخصي
+                </a>
+                <a
+                  href="#"
+                  className="block px-4 py-2 text-sm text-gray-700 text-right hover:bg-gray-100"
+                  role="menuitem"
+                  onClick={() => setIsProfileMenuOpen(false)}
+                >
+                  الإعدادات
+                </a>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="block w-full text-right px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  role="menuitem"
+                >
+                  تسجيل الخروج
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
