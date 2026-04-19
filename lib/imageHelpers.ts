@@ -7,25 +7,16 @@ import { getApiEndpoint } from './api-config';
 
 /**
  * Normalize image URL to use proxy path when needed
- * Converts site2 URLs to proxy through site1 API
+ * Converts full backend image URLs to proxy through current API host
  * @param imagePath - Image path from backend (relative or absolute)
  * @returns Normalized URL for use in img src
  */
 export function normalizeImageUrl(imagePath: string | undefined): string {
   if (!imagePath) return '';
   
-  // If it's a site2 URL (static assets), convert to proxy path
-  if (imagePath.includes('euronews-001-site2.stempurl.com')) {
-    const urlMatch = imagePath.match(/euronews-001-site2\.stempurl\.com(\/.*)/);
-    if (urlMatch) {
-      const path = urlMatch[1];
-      return `/backend-images${path}`;
-    }
-  }
-  
-  // If it's a site1 URL (API), convert to proxy path
-  if (imagePath.includes('euronews-001-site1.stempurl.com')) {
-    const urlMatch = imagePath.match(/euronews-001-site1\.stempurl\.com(\/.*)/);
+  // If it's a full URL to any known backend host, route through proxy.
+  if (imagePath.includes('.stempurl.com/uploads/')) {
+    const urlMatch = imagePath.match(/https?:\/\/[^/]+(\/.*)/);
     if (urlMatch) {
       const path = urlMatch[1];
       return `/backend-images${path}`;

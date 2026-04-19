@@ -71,11 +71,6 @@ const nextConfig: NextConfig = {
         hostname: 'euronews-001-site1.stempurl.com',
         pathname: '/uploads/**',
       },
-        {
-          protocol: 'https',
-          hostname: 'euronews-001-site2.stempurl.com',
-          pathname: '/uploads/**',
-        },
       // Development configuration - HTTPS (local)
       {
         protocol: 'https',
