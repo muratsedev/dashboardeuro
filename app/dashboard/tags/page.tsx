@@ -14,10 +14,6 @@ export default function Tags() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    loadTags();
-  }, []);
-
   const loadTags = async () => {
     try {
       setLoading(true);
@@ -31,6 +27,10 @@ export default function Tags() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadTags();
+  }, []);
 
   const handleDelete = async (id: number) => {
     if (!confirm('هل أنت متأكد من حذف هذا الوسم؟')) {

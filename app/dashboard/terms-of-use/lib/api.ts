@@ -1,5 +1,5 @@
 import { getApiUrl } from '../../../../lib/api-config';
-import { TermsOfUse, CreateTermsOfUseDto, UpdateTermsOfUseDto } from '../types/TermsOfUse';
+import { TermsOfUse, CreateTermsOfUseDto } from '../types/TermsOfUse';
 
 const BASE_API_URL = getApiUrl();
 const API_URL = `${BASE_API_URL}/api/TermsOfUse`;

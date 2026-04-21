@@ -12,10 +12,6 @@ export default function AboutUsManagement() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    loadAboutUs();
-  }, []);
-
   const loadAboutUs = async () => {
     try {
       const data = await getAboutUsList();
@@ -28,6 +24,10 @@ export default function AboutUsManagement() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadAboutUs();
+  }, []);
 
   const handleDelete = async (id: number) => {
     if (!confirm('هل أنت متأكد من حذف هذا العنصر؟')) {

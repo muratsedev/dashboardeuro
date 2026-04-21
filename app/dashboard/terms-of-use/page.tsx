@@ -12,10 +12,6 @@ export default function TermsOfUseManagement() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    loadTermsOfUse();
-  }, []);
-
   const loadTermsOfUse = async () => {
     try {
       const data = await getTermsOfUseList();
@@ -28,6 +24,10 @@ export default function TermsOfUseManagement() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadTermsOfUse();
+  }, []);
 
   const handleDelete = async (id: number) => {
     if (!confirm('هل أنت متأكد من حذف هذا العنصر؟')) {

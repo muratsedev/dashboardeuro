@@ -1,5 +1,5 @@
 import { getApiUrl } from '../../../../lib/api-config';
-import { PrivacyPolicy, CreatePrivacyPolicyDto, UpdatePrivacyPolicyDto } from '../types/PrivacyPolicy';
+import { PrivacyPolicy, CreatePrivacyPolicyDto } from '../types/PrivacyPolicy';
 
 const BASE_API_URL = getApiUrl();
 const API_URL = `${BASE_API_URL}/api/PrivacyPolicies`;

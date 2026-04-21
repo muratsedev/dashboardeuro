@@ -13,10 +13,6 @@ export default function Categories() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    loadCategories();
-  }, []);
-
   const loadCategories = async () => {
     try {
       const data = await getCategories();
@@ -29,6 +25,10 @@ export default function Categories() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadCategories();
+  }, []);
 
   const handleDelete = async (id: number) => {
     if (!confirm('هل أنت متأكد من حذف هذا التصنيف؟')) {

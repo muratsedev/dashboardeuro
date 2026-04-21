@@ -22,10 +22,6 @@ export default function SocialMediaPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchSocialMedias();
-  }, []);
-
   const fetchSocialMedias = async () => {
     try {
       setLoading(true);
@@ -43,6 +39,10 @@ export default function SocialMediaPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchSocialMedias();
+  }, []);
 
   const handleDelete = async (id: number) => {
     if (!confirm('هل أنت متأكد من حذف وسيلة التواصل هذه؟')) {

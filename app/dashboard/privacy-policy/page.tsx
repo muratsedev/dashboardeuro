@@ -12,10 +12,6 @@ export default function PrivacyPolicyManagement() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    loadPrivacyPolicies();
-  }, []);
-
   const loadPrivacyPolicies = async () => {
     try {
       const data = await getPrivacyPoliciesList();
@@ -28,6 +24,10 @@ export default function PrivacyPolicyManagement() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadPrivacyPolicies();
+  }, []);
 
   const handleDelete = async (id: number) => {
     if (!confirm('هل أنت متأكد من حذف هذا العنصر؟')) {
