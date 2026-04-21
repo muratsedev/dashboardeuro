@@ -53,15 +53,21 @@ export default function AddArticle() {
       try {
         setLoading(true);
         
-        // Fetch all data in parallel
-        const [categoriesResponse, tagsResponse, podcastTypesResponse, allUpperArticlesResponse, allArticlesResponse] = await Promise.all([
+        // Fetch all data in parallel — use allSettled so a single failure doesn't block the page
+        const [categoriesResult, tagsResult, podcastTypesResult, allUpperArticlesResult, allArticlesResult] = await Promise.allSettled([
           getCategories(),
           getTags(),
           getPodcastTypes(),
           getUpperArticles(),
-          getArticles() // Get all articles to show current assignments
+          getArticles()
         ]);
-        
+
+        const categoriesResponse = categoriesResult.status === 'fulfilled' ? categoriesResult.value : [];
+        const tagsResponse = tagsResult.status === 'fulfilled' ? tagsResult.value : [];
+        const podcastTypesResponse = podcastTypesResult.status === 'fulfilled' ? podcastTypesResult.value : [];
+        const allUpperArticlesResponse = allUpperArticlesResult.status === 'fulfilled' ? allUpperArticlesResult.value : [];
+        const allArticlesResponse = allArticlesResult.status === 'fulfilled' ? allArticlesResult.value : [];
+
         // Enrich UpperArticles with current assignment information
         const upperArticlesWithAssignments = allUpperArticlesResponse.map(upperArticle => {
           const assignedArticle = allArticlesResponse.find(article => 

@@ -105,7 +105,8 @@ const nextConfig: NextConfig = {
       const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://euronews-001-site1.stempurl.com';
       return [
         {
-          source: '/api/backend/:path*',
+          // Proxy all /api/* requests through Next.js to avoid browser CORS errors
+          source: '/api/:path*',
           destination: `${backendUrl}/api/:path*`,
         },
         // Proxy all image requests through site1 API (which has access to site2 files)

@@ -1,16 +1,20 @@
 /**
  * Get the base API URL with smart fallback logic
- * Priority:
- * 1. Environment variable NEXT_PUBLIC_API_URL
- * 2. Production cloud API (default)
+ * - Browser: returns '' so all /api/* calls go through the Next.js proxy (avoids CORS)
+ * - Server: returns the configured URL for direct server-to-server calls
  */
 export function getApiUrl(): string {
-  // If environment variable is explicitly set, use it
+  // On the client side, use relative URLs so the Next.js rewrite proxy handles the request.
+  // This eliminates cross-origin (CORS) failures when the API is on a different domain.
+  if (typeof window !== 'undefined') {
+    return '';
+  }
+
+  // Server-side: call the external API directly (no CORS restrictions).
   if (process.env.NEXT_PUBLIC_API_URL) {
     return process.env.NEXT_PUBLIC_API_URL;
   }
-  
-  // Default to cloud production API
+
   return 'https://euronews-001-site1.stempurl.com';
 }
 

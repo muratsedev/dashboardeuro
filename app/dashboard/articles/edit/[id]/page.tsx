@@ -71,15 +71,21 @@ export default function EditArticle({ params }: { params: Promise<{ id: string }
         }
         
         const articleData = await articleResponse.json();
-        // Fetch all related data in parallel
-        const [categoriesData, tagsData, podcastTypesData, allUpperArticlesData, allArticlesData] = await Promise.all([
+        // Fetch all related data in parallel — use allSettled so a single failure doesn't block the page
+        const [categoriesResult, tagsResult, podcastTypesResult, allUpperArticlesResult, allArticlesResult] = await Promise.allSettled([
           getCategories(),
           getTags(),
           getPodcastTypes(),
           getUpperArticles(),
-          getArticles() // Get all articles to show current assignments
+          getArticles()
         ]);
-        
+
+        const categoriesData = categoriesResult.status === 'fulfilled' ? categoriesResult.value : [];
+        const tagsData = tagsResult.status === 'fulfilled' ? tagsResult.value : [];
+        const podcastTypesData = podcastTypesResult.status === 'fulfilled' ? podcastTypesResult.value : [];
+        const allUpperArticlesData = allUpperArticlesResult.status === 'fulfilled' ? allUpperArticlesResult.value : [];
+        const allArticlesData = allArticlesResult.status === 'fulfilled' ? allArticlesResult.value : [];
+
         if (Array.isArray(categoriesData)) setCategories(categoriesData);
         if (Array.isArray(tagsData)) setTags(tagsData);
         if (Array.isArray(podcastTypesData)) setPodcastTypes(podcastTypesData);
