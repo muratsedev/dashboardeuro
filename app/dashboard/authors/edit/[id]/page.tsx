@@ -10,7 +10,7 @@ import { getAuthor, updateAuthor } from '../../lib/api';
 export default function EditAuthorPage() {
   const router = useRouter();
   const params = useParams();
-  const id = Number(params.id);
+  const id = Number(params?.id);
 
   const [fullName, setFullName] = useState('');
   const [bio, setBio] = useState('');
