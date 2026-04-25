@@ -17,7 +17,7 @@ export default function WorkflowActions({ contentType, id, currentStatus, onStat
   const [note, setNote] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const callAction = async (action: 'submit' | 'approve' | 'reject' | 'publish' | 'unpublish') => {
+  const callAction = async (action: 'submit' | 'approve' | 'reject' | 'publish' | 'unpublish' | 'draft') => {
     setLoading(true);
     try {
       const token = getToken();
@@ -113,13 +113,22 @@ export default function WorkflowActions({ contentType, id, currentStatus, onStat
 
         {/* Unpublish — Publisher / Admin */}
         {isPublisher && currentStatus === 4 && (
-          <button
-            onClick={() => callAction('unpublish')}
-            disabled={loading}
-            className="px-3 py-1.5 text-sm bg-gray-600 hover:bg-gray-700 text-white rounded disabled:opacity-60"
-          >
-            إلغاء النشر
-          </button>
+          <>
+            <button
+              onClick={() => callAction('unpublish')}
+              disabled={loading}
+              className="px-3 py-1.5 text-sm bg-gray-600 hover:bg-gray-700 text-white rounded disabled:opacity-60"
+            >
+              إلغاء النشر
+            </button>
+            <button
+              onClick={() => callAction('draft')}
+              disabled={loading}
+              className="px-3 py-1.5 text-sm bg-orange-500 hover:bg-orange-600 text-white rounded disabled:opacity-60"
+            >
+              مسودة
+            </button>
+          </>
         )}
       </div>
     </div>
