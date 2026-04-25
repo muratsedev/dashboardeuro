@@ -4,6 +4,7 @@ import { CategoryAll } from '../types/Category';
 import { Tag, CreateTagDto, UpdateTagDto } from '../types/Tag';
 import { PodcastType } from '../types/PodcastType';
 import { UpperArticle, CreateUpperArticleDto, UpdateUpperArticleDto } from '../../upper-articles/types/UpperArticle';
+import { getToken } from '../../../../lib/auth';
 
 // Configure axios for HTTPS development with self-signed certificates
 if (typeof window === 'undefined') {
@@ -22,6 +23,13 @@ const api = axios.create({
   },
   // Allow credentials for CORS
   withCredentials: false
+});
+
+// Add auth token to every request
+api.interceptors.request.use((config) => {
+  const token = getToken();
+  if (token) config.headers['Authorization'] = `Bearer ${token}`;
+  return config;
 });
 
 // Add response interceptor for better error handling
@@ -90,6 +98,7 @@ export const updateArticle = async (id: string, articleData: ArticleCreate, file
 
     const response = await fetch(`${API_URL}/${id}`, {
       method: 'PUT',
+      headers: { Authorization: `Bearer ${getToken()}` },
       body: formData,
     });
 
@@ -186,7 +195,8 @@ export const createArticle = async (articleData: ArticleCreate, file?: File): Pr
 
     const response = await axios.post<ArticleAll>(API_URL, formData, {
       headers: {
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        Authorization: `Bearer ${getToken()}`
       },
       timeout: 30000,
       maxContentLength: Infinity,
