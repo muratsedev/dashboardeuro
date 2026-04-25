@@ -22,6 +22,7 @@ export default function Articles() {
   const [sortField, setSortField] = useState<'articleTitle' | 'isPublished' | 'createdDate' | 'categoryName' | 'editorChoice'>('createdDate');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
   const articlesPerPage = 20;
 
   const router = useRouter();
@@ -86,8 +87,10 @@ export default function Articles() {
     });
   };
 
-  // Get current articles for pagination
-  const sortedArticles = getSortedArticles();
+  // Get current articles for pagination (with search filter)
+  const sortedArticles = getSortedArticles().filter((a) =>
+    !searchQuery || a.articleTitle.toLowerCase().includes(searchQuery.toLowerCase())
+  );
   const totalPages = Math.ceil(sortedArticles.length / articlesPerPage);
   const indexOfLastArticle = currentPage * articlesPerPage;
   const indexOfFirstArticle = indexOfLastArticle - articlesPerPage;
@@ -265,7 +268,7 @@ export default function Articles() {
   return (
     <div className="container mx-auto">
       <Toaster />
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
         <Link
           href="/dashboard/articles/add"
           className="w-full sm:w-auto px-4 py-2 bg-blue-700 text-white rounded-md hover:bg-custom-blue-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-green flex items-center justify-center"
@@ -275,6 +278,18 @@ export default function Articles() {
         </Link>
 
         <h1 className="text-2xl font-semibold text-gray-800">الأخبار</h1>
+      </div>
+
+      {/* Search */}
+      <div className="mb-4">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+          placeholder="بحث بعنوان الخبر..."
+          className="w-full sm:max-w-sm px-4 py-2 border border-gray-300 rounded-md text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
+          dir="rtl"
+        />
       </div>
 
       {articles.length === 0 ? (

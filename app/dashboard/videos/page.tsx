@@ -38,6 +38,7 @@ export default function Videos() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingVideo, setEditingVideo] = useState<Video | null>(null);
   const [formData, setFormData] = useState<CreateVideoDto>({
@@ -154,7 +155,7 @@ export default function Videos() {
     <div className="container mx-auto px-4 py-8">
       <Toaster position="top-center" />
       
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold text-gray-800">إدارة الفيديوهات</h1>
         <button
           onClick={() => openModal()}
@@ -163,6 +164,18 @@ export default function Videos() {
           <PlusIcon className="h-5 w-5" />
           إضافة فيديو
         </button>
+      </div>
+
+      {/* Search */}
+      <div className="mb-4">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="بحث بعنوان الفيديو..."
+          className="w-full sm:max-w-sm px-4 py-2 border border-gray-300 rounded-md text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
+          dir="rtl"
+        />
       </div>
 
       {videos.length === 0 ? (
@@ -215,7 +228,9 @@ export default function Videos() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {videos.map((video) => (
+              {videos
+                .filter((v) => !searchQuery || v.videoTitle.toLowerCase().includes(searchQuery.toLowerCase()))
+                .map((video) => (
                 <tr key={video.videoId} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {video.videoTitle}

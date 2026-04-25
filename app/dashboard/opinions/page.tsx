@@ -17,6 +17,7 @@ export default function OpinionsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
   const itemsPerPage = 20;
   const router = useRouter();
 
@@ -48,8 +49,11 @@ export default function OpinionsPage() {
     }
   };
 
-  const totalPages = Math.ceil(opinions.length / itemsPerPage);
-  const currentItems = opinions.slice(
+  const filteredOpinions = opinions.filter((o) =>
+    !searchQuery || o.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  const totalPages = Math.ceil(filteredOpinions.length / itemsPerPage);
+  const currentItems = filteredOpinions.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -84,7 +88,7 @@ export default function OpinionsPage() {
       <Toaster position="top-center" />
 
       {/* Header */}
-      <div className="flex justify-between items-start mb-6">
+      <div className="flex justify-between items-start mb-4">
         <div className="text-right">
           <h1 className="text-2xl font-bold text-gray-900">مقالات</h1>
           <p className="text-sm text-gray-500 mt-0.5">إدارة مقالات الرأي</p>
@@ -101,6 +105,18 @@ export default function OpinionsPage() {
             إضافة مقال
           </Link>
         </div>
+      </div>
+
+      {/* Search */}
+      <div className="mb-4">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+          placeholder="بحث بعنوان المقال..."
+          className="w-full sm:max-w-sm px-4 py-2 border border-gray-300 rounded-md text-right focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          dir="rtl"
+        />
       </div>
 
       {/* Table */}
