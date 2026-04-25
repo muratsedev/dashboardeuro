@@ -58,7 +58,7 @@ export default function Tags() {
   return (
     <div className="container mx-auto p-6" dir="rtl">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold text-gray-800">وسوم المقالات</h1>
+        <h1 className="text-2xl font-semibold text-gray-800">وسوم الأخبار</h1>
         <button
           onClick={() => router.push('/dashboard/tags/add')}
           className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 flex items-center gap-2"

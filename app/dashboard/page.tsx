@@ -89,7 +89,7 @@ export default function Dashboard() {
   // Dynamic stats array with real data
   const dashboardStats = [
     { 
-      name: 'إجمالي المقالات', 
+      name: 'إجمالي الأخبار', 
       value: loading ? '...' : (stats.totalArticles ?? 0).toString(), 
       icon: DocumentTextIcon, 
       change: `+${stats.recentArticles ?? 0}`, 
@@ -97,7 +97,7 @@ export default function Dashboard() {
       changeLabel: 'خلال الشهر الماضي'
     },
     { 
-      name: 'المقالات المنشورة', 
+      name: 'الأخبار المنشورة', 
       value: loading ? '...' : (stats.publishedArticles ?? 0).toString(), 
       icon: CheckCircleIcon, 
       change: `+${Math.floor((stats.recentArticles ?? 0) * 0.8)}`, 
@@ -222,7 +222,7 @@ export default function Dashboard() {
               عرض الكل
             </button>
           </Link>
-          <h2 className="text-lg font-medium text-gray-900">أحدث المقالات</h2>
+          <h2 className="text-lg font-medium text-gray-900">أحدث الأخبار</h2>
         </div>
         {loading ? (
           <div className="text-center py-8">
@@ -234,7 +234,7 @@ export default function Dashboard() {
             <p className="text-gray-500">لا توجد مقالات حديثة</p>
             <Link href="/dashboard/articles/add">
               <button className="mt-2 text-indigo-600 hover:text-indigo-800">
-                إضافة مقال جديد
+                إضافة خبر جديد
               </button>
             </Link>
           </div>

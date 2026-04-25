@@ -7,14 +7,17 @@ import {
   DocumentTextIcon, 
   FolderIcon, 
   TagIcon,
-  UsersIcon, 
+  UsersIcon,
+  UserIcon,
   CogIcon,
   ChevronUpIcon,
   ExclamationTriangleIcon,
   ShareIcon,
   DocumentIcon,
   ShieldCheckIcon,
-  InformationCircleIcon
+  InformationCircleIcon,
+  FilmIcon,
+  MicrophoneIcon
 } from '@heroicons/react/24/outline';
 
 export default function Sidebar() {
@@ -24,12 +27,16 @@ export default function Sidebar() {
     // { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
     { name: 'الرئيسية', href: '/dashboard', icon: HomeIcon },
     // { name: 'Articles', href: '/dashboard/articles', icon: DocumentTextIcon },
-    { name: 'المقالات', href: '/dashboard/articles', icon: DocumentTextIcon },
+    { name: 'الأخبار', href: '/dashboard/articles', icon: DocumentTextIcon },
+    { name: 'مقالات', href: '/dashboard/opinions', icon: DocumentTextIcon },
     // { name: 'Categories', href: '/dashboard/categories', icon: FolderIcon },
     { name: 'الأقسام', href: '/dashboard/categories', icon: FolderIcon },
     { name: 'وسوم', href: '/dashboard/tags', icon: TagIcon },
-    { name: 'المقالات في الأعلى', href: '/dashboard/upper-articles', icon: ChevronUpIcon },
+    { name: 'الأخبار في الأعلى', href: '/dashboard/upper-articles', icon: ChevronUpIcon },
     { name: 'الأخبار العاجلة', href: '/dashboard/breaking-news', icon: ExclamationTriangleIcon },
+    { name: 'الفيديوهات', href: '/dashboard/videos', icon: FilmIcon },
+    { name: 'البودكاست', href: '/dashboard/podcasts', icon: MicrophoneIcon },
+    { name: 'كتّاب الرأي', href: '/dashboard/authors', icon: UserIcon },
     { name: 'وسائل التواصل الاجتماعي', href: '/dashboard/social-media', icon: ShareIcon },
     { name: 'شروط الاستخدام', href: '/dashboard/terms-of-use', icon: DocumentIcon },
     { name: 'سياسة الخصوصية', href: '/dashboard/privacy-policy', icon: ShieldCheckIcon },

@@ -11,6 +11,29 @@ import {
 import { getVideos, createVideo, updateVideo, deleteVideo } from "./lib/api";
 import { Video, CreateVideoDto, UpdateVideoDto } from "./types/Video";
 
+function getYouTubeEmbedUrl(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    let videoId: string | null = null;
+
+    if (parsed.hostname === 'youtu.be') {
+      videoId = parsed.pathname.slice(1).split('?')[0];
+    } else if (
+      parsed.hostname === 'www.youtube.com' ||
+      parsed.hostname === 'youtube.com'
+    ) {
+      videoId = parsed.searchParams.get('v');
+      if (!videoId && parsed.pathname.startsWith('/embed/')) {
+        videoId = parsed.pathname.replace('/embed/', '').split('?')[0];
+      }
+    }
+
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function Videos() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -181,7 +204,7 @@ export default function Videos() {
                   الملخص
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  الرابط
+                  معاينة
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   الحالة
@@ -204,15 +227,30 @@ export default function Videos() {
                       <span className="text-gray-400">-</span>
                     )}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    <a
-                      href={video.videoLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-800 underline"
-                    >
-                      {video.videoLink.substring(0, 50)}...
-                    </a>
+                  <td className="px-4 py-3">
+                    {(() => {
+                      const embedUrl = getYouTubeEmbedUrl(video.videoLink);
+                      return embedUrl ? (
+                        <iframe
+                          src={embedUrl}
+                          className="rounded"
+                          width="200"
+                          height="113"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          title={video.videoTitle}
+                        />
+                      ) : (
+                        <a
+                          href={video.videoLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800 underline text-sm"
+                        >
+                          {video.videoLink.substring(0, 50)}...
+                        </a>
+                      );
+                    })()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span

@@ -83,7 +83,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
                 aria-haspopup="menu"
               >
                   <span className="sr-only">فتح قائمة المستخدم</span>
-                  <div className="h-8 w-8 rounded-full bg-green-600 flex items-center justify-center text-white">
+                  <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
                     A
                   </div>
               </button>

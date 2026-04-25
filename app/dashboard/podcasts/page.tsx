@@ -10,6 +10,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { getPodcasts, createPodcast, updatePodcast, deletePodcast } from "./lib/api";
 import { Podcast, CreatePodcastDto, UpdatePodcastDto } from "./types/Podcast";
+import PodcastPlayer from "../../../components/PodcastPlayer";
 
 export default function Podcasts() {
   const [podcasts, setPodcasts] = useState<Podcast[]>([]);
@@ -177,7 +178,7 @@ export default function Podcasts() {
                   الملخص
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  الرابط
+                  معاينة
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   الحالة
@@ -200,15 +201,11 @@ export default function Podcasts() {
                       <span className="text-gray-400">-</span>
                     )}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    <a
-                      href={podcast.podcastLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-800 underline"
-                    >
-                      {podcast.podcastLink.substring(0, 50)}...
-                    </a>
+                  <td className="px-4 py-3 max-w-xs">
+                    <PodcastPlayer
+                      url={podcast.podcastLink}
+                      title={podcast.podcastTitle}
+                    />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span

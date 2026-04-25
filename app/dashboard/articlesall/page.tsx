@@ -74,7 +74,7 @@ const ArticlesPage = () => {
           <PlusIcon className="h-5 w-5 ml-2" />
           إضافة مقال جديد
         </Link>
-        <h1 className="text-2xl font-semibold text-gray-800">جميع المقالات</h1>
+        <h1 className="text-2xl font-semibold text-gray-800">جميع الأخبار</h1>
       </div>
 
       {articles.length === 0 ? (
