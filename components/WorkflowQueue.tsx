@@ -86,13 +86,13 @@ export default function WorkflowQueue({ contentType }: WorkflowQueueProps) {
       if (res.status === 401) { router.push('/'); return; }
       if (!res.ok) throw new Error('فشل تحميل القائمة');
       const data: QueueItem[] = await res.json();
-      setItems(data.filter((d) => d.type === contentType));
+      if (!signal?.aborted) setItems(data.filter((d) => d.type === contentType));
     } catch (err: unknown) {
       if (err instanceof Error && err.name === 'AbortError') return;
       toast.error('تعذر تحميل البيانات', { id: `wf-queue-${contentType}` });
     } finally {
       loadingRef.current = false;
-      setLoading(false);
+      if (!signal?.aborted) setLoading(false);
     }
   }, [contentType, statusFilter, router]);
 
