@@ -18,11 +18,14 @@ import { getCategories, getTags, getPodcastTypes, getUpperArticles, getArticles,
 import RichTextEditor from "../../../../../components/RichTextEditor";
 import { getApiUrl } from "../../../../../lib/api-config";
 import { getImageSrc } from "../../../../../lib/imageHelpers";
+import WorkflowActions from "../../../../../components/WorkflowActions";
+import type { WorkflowStatus } from "../../../../../components/WorkflowBadge";
 
 export default function EditArticle({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const { id } = use(params);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [workflowStatus, setWorkflowStatus] = useState<number>(0);
   const [categories, setCategories] = useState<CategoryAll[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [podcastTypes, setPodcastTypes] = useState<PodcastType[]>([]);
@@ -143,6 +146,7 @@ export default function EditArticle({ params }: { params: Promise<{ id: string }
           podcastTypeId: articleData.podcastTypeId || undefined,
           upperArticleId: articleData.upperArticleId || undefined,
         });
+        setWorkflowStatus(articleData.workflowStatus ?? 0);
         
         // Set current image if exists
         if (articleData.imagePath) {
@@ -514,6 +518,14 @@ export default function EditArticle({ params }: { params: Promise<{ id: string }
             <button type="submit" disabled={isSubmitting} className={`w-full sm:w-auto px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-700 hover:bg-custom-green-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-green ${isSubmitting ? "opacity-75 cursor-not-allowed" : ""}`}>{isSubmitting ? "جاري الحفظ..." : "حفظ التغييرات"}</button>
           </div>
         </form>
+      </div>
+      <div className="mt-6 max-w-4xl mx-auto">
+        <WorkflowActions
+          contentType="articles"
+          id={id}
+          currentStatus={workflowStatus as WorkflowStatus}
+          onStatusChange={(newStatus) => setWorkflowStatus(newStatus)}
+        />
       </div>
         </div>
       </div>

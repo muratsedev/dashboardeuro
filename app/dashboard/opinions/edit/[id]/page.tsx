@@ -8,6 +8,8 @@ import Image from "next/image";
 import { getOpinion, updateOpinion, getAuthors, getTags } from "../../lib/api";
 import RichTextEditor from "../../../../../components/RichTextEditor";
 import { normalizeImageUrl } from "../../../../../lib/imageHelpers";
+import WorkflowActions from "../../../../../components/WorkflowActions";
+import type { WorkflowStatus } from "../../../../../components/WorkflowBadge";
 
 export default function EditOpinionPage({
   params,
@@ -18,6 +20,7 @@ export default function EditOpinionPage({
   const { id } = use(params);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [workflowStatus, setWorkflowStatus] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [authors, setAuthors] = useState<{ id: number; fullName: string | null }[]>([]);
   const [tags, setTags] = useState<{ tagId: number; tagName: string }[]>([]);
@@ -57,6 +60,7 @@ export default function EditOpinionPage({
         }
         setAuthors(authorsData);
         setTags(tagsData);
+        setWorkflowStatus((opinion as { workflowStatus?: number }).workflowStatus ?? 0);
       } catch (err) {
         toast.error("فشل في تحميل بيانات المقال");
       } finally {
@@ -293,6 +297,14 @@ export default function EditOpinionPage({
             </button>
           </div>
         </form>
+      </div>
+      <div className="mt-6">
+        <WorkflowActions
+          contentType="opinions"
+          id={id}
+          currentStatus={workflowStatus as WorkflowStatus}
+          onStatusChange={(newStatus) => setWorkflowStatus(newStatus)}
+        />
       </div>
     </div>
   );

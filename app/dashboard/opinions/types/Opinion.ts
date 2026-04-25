@@ -12,6 +12,7 @@ export interface Opinion {
   authorPicture: string | null;
   tagId: number | null;
   tagName: string | null;
+  workflowStatus?: number;
 }
 
 export interface OpinionCreate {

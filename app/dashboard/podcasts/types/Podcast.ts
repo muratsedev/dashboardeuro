@@ -4,6 +4,7 @@ export interface Podcast {
   podcastSummary?: string;
   podcastLink: string;
   isPublished: boolean;
+  workflowStatus?: number;
 }
 
 export interface CreatePodcastDto {

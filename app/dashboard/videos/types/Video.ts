@@ -8,6 +8,7 @@ export interface Video {
   modifiedVideoDate: Date;
   tagId?: number;
   tagName?: string;
+  workflowStatus?: number;
 }
 
 export interface CreateVideoDto {

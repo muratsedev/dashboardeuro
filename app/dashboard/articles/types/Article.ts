@@ -36,6 +36,7 @@ export interface ArticleAll {
   tagId?: number;
   podcastTypeId?: number;
   upperArticleId?: number;
+  workflowStatus?: number;
   category: {
     id: number;
     name: string;

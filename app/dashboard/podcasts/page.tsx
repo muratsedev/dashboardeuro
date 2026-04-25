@@ -11,6 +11,7 @@ import {
 import { getPodcasts, createPodcast, updatePodcast, deletePodcast } from "./lib/api";
 import { Podcast, CreatePodcastDto, UpdatePodcastDto } from "./types/Podcast";
 import PodcastPlayer from "../../../components/PodcastPlayer";
+import { WorkflowBadge, WorkflowStatus } from "../../../components/WorkflowBadge";
 
 export default function Podcasts() {
   const [podcasts, setPodcasts] = useState<Podcast[]>([]);
@@ -232,6 +233,9 @@ export default function Podcasts() {
                     >
                       {podcast.isPublished ? "منشور" : "غير منشور"}
                     </span>
+                    <div className="mt-1">
+                      <WorkflowBadge status={(podcast.workflowStatus ?? 0) as WorkflowStatus} />
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex gap-2">

@@ -10,6 +10,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { getVideos, createVideo, updateVideo, deleteVideo } from "./lib/api";
 import { Video, CreateVideoDto, UpdateVideoDto } from "./types/Video";
+import { WorkflowBadge, WorkflowStatus } from "../../../components/WorkflowBadge";
 
 function getYouTubeEmbedUrl(url: string): string | null {
   try {
@@ -277,6 +278,9 @@ export default function Videos() {
                     >
                       {video.isPublished ? "منشور" : "غير منشور"}
                     </span>
+                    <div className="mt-1">
+                      <WorkflowBadge status={(video.workflowStatus ?? 0) as WorkflowStatus} />
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex gap-2">

@@ -14,6 +14,7 @@ import { getArticles } from "./lib/api";
 import { ArticleAll } from "./types/Article";
 import EmptyState from "../../../components/EmptyState";
 import { getApiUrl } from "../../../lib/api-config";
+import { WorkflowBadge, WorkflowStatus } from "../../../components/WorkflowBadge";
 
 export default function Articles() {
   const [articles, setArticles] = useState<ArticleAll[]>([]);
@@ -344,6 +345,12 @@ export default function Articles() {
                     scope="col"
                     className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
+                    سير العمل
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     الإجراءات
                   </th>
                 </tr>
@@ -395,6 +402,9 @@ export default function Articles() {
                         day: '2-digit',
                         calendar: 'gregory'
                       }) : "غير محدد"}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                      <WorkflowBadge status={(article.workflowStatus ?? 0) as WorkflowStatus} />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-right">
                       <button

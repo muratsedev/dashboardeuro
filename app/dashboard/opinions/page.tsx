@@ -11,6 +11,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { getOpinions, deleteOpinion } from "./lib/api";
 import { Opinion } from "./types/Opinion";
+import { WorkflowBadge, WorkflowStatus } from "../../../components/WorkflowBadge";
 
 export default function OpinionsPage() {
   const [opinions, setOpinions] = useState<Opinion[]>([]);
@@ -178,6 +179,9 @@ export default function OpinionsPage() {
                     >
                       {opinion.isPublished ? "منشور" : "مسودة"}
                     </span>
+                    <div className="mt-1">
+                      <WorkflowBadge status={(opinion.workflowStatus ?? 0) as WorkflowStatus} />
+                    </div>
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-500">
                     {opinion.createdDate
