@@ -27,6 +27,10 @@ export interface AxiosError<T = unknown> extends Error {
   isAxiosError: true;
 }
 
+type RequestConfig = AxiosRequestConfig & { url?: string; method?: Method };
+type RequestFulfilled = (config: RequestConfig) => RequestConfig | Promise<RequestConfig>;
+type RequestRejected = (error: unknown) => unknown;
+
 type ResponseFulfilled = <T>(response: AxiosResponse<T>) => AxiosResponse<T> | Promise<AxiosResponse<T>>;
 type ResponseRejected = (error: AxiosError) => unknown;
 
@@ -82,12 +86,23 @@ const createAxiosError = <T>(
 class AxiosInstance {
   private defaults: AxiosRequestConfig;
 
+  private requestHandlers: Array<{
+    onFulfilled?: RequestFulfilled;
+    onRejected?: RequestRejected;
+  }> = [];
+
   private responseHandlers: Array<{
     onFulfilled?: ResponseFulfilled;
     onRejected?: ResponseRejected;
   }> = [];
 
   public interceptors = {
+    request: {
+      use: (onFulfilled?: RequestFulfilled, onRejected?: RequestRejected) => {
+        this.requestHandlers.push({ onFulfilled, onRejected });
+        return this.requestHandlers.length - 1;
+      },
+    },
     response: {
       use: (onFulfilled?: ResponseFulfilled, onRejected?: ResponseRejected) => {
         this.responseHandlers.push({ onFulfilled, onRejected });
@@ -101,7 +116,7 @@ class AxiosInstance {
   }
 
   async request<T>(method: Method, url: string, config: AxiosRequestConfig = {}): Promise<AxiosResponse<T>> {
-    const mergedConfig = {
+    let mergedConfig: RequestConfig = {
       ...this.defaults,
       ...config,
       headers: {
@@ -112,13 +127,25 @@ class AxiosInstance {
       method,
     };
 
+    // Apply request interceptors
+    for (const handler of this.requestHandlers) {
+      if (handler.onFulfilled) {
+        try {
+          mergedConfig = await handler.onFulfilled(mergedConfig);
+        } catch (error) {
+          if (handler.onRejected) await handler.onRejected(error);
+          throw error;
+        }
+      }
+    }
+
     const controller = typeof AbortController !== 'undefined' ? new AbortController() : undefined;
     const timeoutId = controller && mergedConfig.timeout
       ? setTimeout(() => controller.abort(), mergedConfig.timeout)
       : undefined;
 
     try {
-      const payload = config.data ?? config.body;
+      const payload = mergedConfig.data ?? mergedConfig.body;
       const headers = { ...(mergedConfig.headers || {}) };
 
       let body: BodyInit | undefined;

@@ -57,3 +57,5 @@ dist/
 
 # OS
 Thumbs.db
+
+build-output.txt
