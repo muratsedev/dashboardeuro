@@ -47,8 +47,8 @@ export default function Sidebar() {
     { name: 'شروط الاستخدام', href: '/dashboard/terms-of-use', icon: DocumentIcon },
     { name: 'سياسة الخصوصية', href: '/dashboard/privacy-policy', icon: ShieldCheckIcon },
     { name: 'عن الأوروبية', href: '/dashboard/about-us', icon: InformationCircleIcon },
-    { name: 'Users', href: '/dashboard/users', icon: UsersIcon },
-    { name: 'Settings', href: '/dashboard/settings', icon: CogIcon },
+    { name: 'المستخدمون', href: '/dashboard/users', icon: UsersIcon },
+    { name: 'الإعدادات', href: '/dashboard/settings', icon: CogIcon },
   ];
 
   return (

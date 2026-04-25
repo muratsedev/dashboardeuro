@@ -65,6 +65,7 @@ interface WorkflowQueueProps {
 export default function WorkflowQueue({ contentType }: WorkflowQueueProps) {
   const [items, setItems] = useState<QueueItem[]>([]);
   const [statusFilter, setStatusFilter] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -127,9 +128,9 @@ export default function WorkflowQueue({ contentType }: WorkflowQueueProps) {
     );
   };
 
-  const filteredItems = statusFilter !== null
-    ? items.filter((i) => i.workflowStatus === statusFilter)
-    : items;
+  const filteredItems = items
+    .filter((i) => statusFilter === null || i.workflowStatus === statusFilter)
+    .filter((i) => !searchQuery || i.title.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
     <div dir="rtl" className="space-y-4">
@@ -153,6 +154,25 @@ export default function WorkflowQueue({ contentType }: WorkflowQueueProps) {
             إضافة جديد
           </Link>
         </div>
+      </div>
+
+      {/* Search */}
+      <div className="relative">
+        <input
+          type="text"
+          placeholder="بحث بالعنوان..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full px-4 py-2 pr-10 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        {searchQuery && (
+          <button
+            onClick={() => setSearchQuery('')}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs"
+          >
+            ✕
+          </button>
+        )}
       </div>
 
       {/* Status filter tabs */}
