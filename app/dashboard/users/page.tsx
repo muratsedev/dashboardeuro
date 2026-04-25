@@ -6,6 +6,8 @@ import toast from 'react-hot-toast';
 import { getApiEndpoint } from '@/lib/api-config';
 import { getToken, hasRole, Roles } from '@/lib/auth';
 
+const SUPERUSER_EMAIL = 'superuser@euronews.com';
+
 interface User {
   id: string;
   email: string;
@@ -126,16 +128,20 @@ export default function Users() {
                     </td>
                     {isAdmin && (
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2 space-x-reverse">
-                        <Link href={`/dashboard/users/edit/${user.id}`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 ml-3">
-                          تعديل
-                        </Link>
-                        {user.isActive && (
-                          <button
-                            onClick={() => handleDeactivate(user.id)}
-                            className="text-red-600 hover:text-red-900 dark:text-red-400"
-                          >
-                            تعطيل
-                          </button>
+                        {user.email !== SUPERUSER_EMAIL && (
+                          <>
+                            <Link href={`/dashboard/users/edit/${user.id}`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 ml-3">
+                              تعديل
+                            </Link>
+                            {user.isActive && (
+                              <button
+                                onClick={() => handleDeactivate(user.id)}
+                                className="text-red-600 hover:text-red-900 dark:text-red-400"
+                              >
+                                تعطيل
+                              </button>
+                            )}
+                          </>
                         )}
                       </td>
                     )}
