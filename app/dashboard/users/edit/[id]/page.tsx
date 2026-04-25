@@ -2,222 +2,236 @@
 
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
+import { getApiEndpoint } from '@/lib/api-config';
+import { getToken } from '@/lib/auth';
+
+const ROLES = [
+  { value: 'Admin',       label: 'مدير — Admin' },
+  { value: 'Editor',      label: 'محرر — Editor' },
+  { value: 'ProofReader', label: 'مدقق — ProofReader' },
+  { value: 'Publisher',   label: 'ناشر — Publisher' },
+];
 
 interface EditUserProps {
-  params: Promise<{
-    id: string;
-  }>;
+  params: Promise<{ id: string }>;
 }
-
 
 export default function EditUser({ params }: EditUserProps) {
   const router = useRouter();
   const { id: userId } = use(params);
-  
-  const [isLoading, setIsLoading] = useState(true);
-  const [formData, setFormData] = useState({
-    name: '',
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [resettingPw, setResettingPw] = useState(false);
+  const [form, setForm] = useState({
+    firstName: '',
+    lastName: '',
     email: '',
-    role: '',
-    status: ''
+    role: 'Editor',
+    isActive: true,
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   useEffect(() => {
-    // Simulate fetching user data
-    setTimeout(() => {
-      // This would be an API call in a real application
-      const userData = {
-        name: 'John Doe',
-        email: 'john@example.com',
-        role: 'Admin',
-        status: 'Active'
-      };
-      
-      setFormData(userData);
-      setIsLoading(false);
-    }, 500);
+    fetch(getApiEndpoint(`/api/Users/${userId}`), {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    })
+      .then((r) => r.json())
+      .then((u) => {
+        setForm({
+          firstName: u.firstName,
+          lastName: u.lastName,
+          email: u.email,
+          role: u.role || 'Editor',
+          isActive: u.isActive,
+        });
+      })
+      .catch(() => toast.error('فشل تحميل بيانات المستخدم'))
+      .finally(() => setLoading(false));
   }, [userId]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    
-    // Clear error when field is edited
-    if (errors[name]) {
-      setErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-    
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
-    }
-    
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-    
-    setIsSubmitting(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      console.log('Updated user data:', formData);
-      setIsSubmitting(false);
+    setSaving(true);
+    try {
+      const res = await fetch(getApiEndpoint(`/api/Users/${userId}`), {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getToken()}`,
+        },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data?.message || 'فشل تحديث المستخدم');
+        return;
+      }
+      toast.success('تم تحديث المستخدم بنجاح');
       router.push('/dashboard/users');
-    }, 1000);
+    } catch {
+      toast.error('تعذر الاتصال بالخادم');
+    } finally {
+      setSaving(false);
+    }
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="w-12 h-12 border-t-4 border-b-4 border-indigo-500 rounded-full animate-spin"></div>
-      </div>
-    );
+  const handleResetPassword = async () => {
+    if (!newPassword) { toast.error('أدخل كلمة المرور الجديدة'); return; }
+    if (newPassword !== confirmPassword) { toast.error('كلمتا المرور غير متطابقتين'); return; }
+    if (newPassword.length < 6) { toast.error('كلمة المرور يجب أن تكون 6 أحرف على الأقل'); return; }
+    setResettingPw(true);
+    try {
+      const res = await fetch(getApiEndpoint(`/api/Users/${userId}/reset-password`), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getToken()}`,
+        },
+        body: JSON.stringify({ newPassword }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success('تم إعادة تعيين كلمة المرور');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch {
+      toast.error('فشل إعادة تعيين كلمة المرور');
+    } finally {
+      setResettingPw(false);
+    }
+  };
+
+  if (loading) {
+    return <div dir="rtl" className="p-8 text-gray-500">جارٍ التحميل...</div>;
   }
 
   return (
-    <div className="container mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <button
-          onClick={() => router.back()}
-          className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-        >
-          Back
+    <div dir="rtl" className="max-w-2xl mx-auto space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">تعديل المستخدم</h1>
+        <button onClick={() => router.back()} className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400">
+          ← رجوع
         </button>
-        <h1 className="text-2xl font-semibold text-gray-800">Edit User</h1>
       </div>
-      
-      <div className="bg-white shadow-md rounded-lg p-6">
-        <form onSubmit={handleSubmit} className="space-y-6 text-right">
+
+      {/* Main form */}
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-5"
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-              Full Name
-            </label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">الاسم الأول *</label>
             <input
               type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className={`mt-1 block w-full border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-right`}
+              value={form.firstName}
+              onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm"
+              required
             />
-            {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
           </div>
-          
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email Address
-            </label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">الاسم الأخير *</label>
             <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className={`mt-1 block w-full border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-right`}
+              type="text"
+              value={form.lastName}
+              onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm"
+              required
             />
-            {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700">
-                Role
-              </label>
-              <select
-                id="role"
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-right"
-              >
-                <option value="Admin">Admin</option>
-                <option value="Editor">Editor</option>
-                <option value="Viewer">Viewer</option>
-              </select>
-            </div>
-            
-            <div>
-              <label htmlFor="status" className="block text-sm font-medium text-gray-700">
-                Status
-              </label>
-              <select
-                id="status"
-                name="status"
-                value={formData.status}
-                onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-right"
-              >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </select>
-            </div>
-          </div>
-          
-          <div className="border-t border-gray-200 pt-4 mt-4">
-            <h3 className="text-lg font-medium text-gray-900">Reset Password (Optional)</h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-              <div>
-                <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
-                  New Password
-                </label>
-                <input
-                  type="password"
-                  id="newPassword"
-                  name="newPassword"
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-right"
-                />
-              </div>
-              
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                  Confirm New Password
-                </label>
-                <input
-                  type="password"
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-right"
-                />
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex justify-start">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className={`px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${isSubmitting ? 'opacity-75 cursor-not-allowed' : ''}`}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">البريد الإلكتروني *</label>
+          <input
+            type="email"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm"
+            required
+          />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">الدور *</label>
+            <select
+              value={form.role}
+              onChange={(e) => setForm({ ...form, role: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm"
             >
-              {isSubmitting ? 'Saving...' : 'Update User'}
-            </button>
+              {ROLES.map((r) => (
+                <option key={r.value} value={r.value}>{r.label}</option>
+              ))}
+            </select>
           </div>
-        </form>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">الحالة</label>
+            <select
+              value={form.isActive ? 'active' : 'inactive'}
+              onChange={(e) => setForm({ ...form, isActive: e.target.value === 'active' })}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm"
+            >
+              <option value="active">نشط</option>
+              <option value="inactive">معطل</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-3 pt-2">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800"
+          >
+            إلغاء
+          </button>
+          <button
+            type="submit"
+            disabled={saving}
+            className="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded disabled:opacity-60"
+          >
+            {saving ? 'جارٍ الحفظ...' : 'حفظ التغييرات'}
+          </button>
+        </div>
+      </form>
+
+      {/* Password reset section */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-4">
+        <h2 className="text-base font-semibold text-gray-800 dark:text-white">إعادة تعيين كلمة المرور</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">كلمة المرور الجديدة</label>
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">تأكيد كلمة المرور</label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm"
+            />
+          </div>
+        </div>
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={handleResetPassword}
+            disabled={resettingPw}
+            className="px-4 py-2 text-sm bg-orange-500 hover:bg-orange-600 text-white rounded disabled:opacity-60"
+          >
+            {resettingPw ? 'جارٍ إعادة التعيين...' : 'إعادة تعيين كلمة المرور'}
+          </button>
+        </div>
       </div>
     </div>
   );
