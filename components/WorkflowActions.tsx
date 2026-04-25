@@ -112,7 +112,7 @@ export default function WorkflowActions({ contentType, id, currentStatus, onStat
         )}
 
         {/* Unpublish — Publisher / Admin */}
-        {isPublisher && currentStatus === 4 && contentType === 'articles' && (
+        {isPublisher && currentStatus === 4 && (
           <button
             onClick={() => callAction('unpublish')}
             disabled={loading}

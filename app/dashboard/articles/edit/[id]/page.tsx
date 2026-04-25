@@ -479,8 +479,7 @@ export default function EditArticle({ params }: { params: Promise<{ id: string }
                       width={192}
                       height={128}
                       className="h-32 w-48 object-cover mb-2 rounded-md mx-auto max-w-full"
-                      onError={(e) => {
-                        console.error('Image load error:', e);
+                      onError={() => {
                         setCurrentImage(null);
                       }}
                       unoptimized={true}
