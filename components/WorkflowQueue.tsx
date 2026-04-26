@@ -19,6 +19,7 @@ interface QueueItem {
   workflowStatus: WorkflowStatus;
   workflowNote?: string;
   updatedAt?: string;
+  createdAt?: string;
 }
 
 const STATUS_FILTERS: { label: string; value: number | null }[] = [
@@ -130,7 +131,12 @@ export default function WorkflowQueue({ contentType }: WorkflowQueueProps) {
 
   const filteredItems = items
     .filter((i) => statusFilter === null || i.workflowStatus === statusFilter)
-    .filter((i) => !searchQuery || i.title.toLowerCase().includes(searchQuery.toLowerCase()));
+    .filter((i) => !searchQuery || i.title.toLowerCase().includes(searchQuery.toLowerCase()))
+    .sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA;
+    });
 
   return (
     <div dir="rtl" className="space-y-4">
@@ -215,9 +221,9 @@ export default function WorkflowQueue({ contentType }: WorkflowQueueProps) {
                 </span>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
-                {item.updatedAt && (
+                {item.createdAt && (
                   <span className="hidden sm:inline text-xs text-gray-400">
-                    {new Date(item.updatedAt).toLocaleDateString('ar-SA')}
+                    {new Date(item.createdAt).toLocaleDateString('ar-SA')}
                   </span>
                 )}
                 <Link
