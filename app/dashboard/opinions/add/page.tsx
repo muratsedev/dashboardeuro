@@ -76,7 +76,7 @@ export default function AddOpinionPage() {
         imageFile ?? undefined
       );
       toast.success("تم إضافة المقال بنجاح");
-      router.push("/dashboard/opinions");
+      router.push("/dashboard/workflow/opinions");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "فشل في إضافة المقال");
     } finally {

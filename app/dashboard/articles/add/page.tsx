@@ -299,7 +299,7 @@ export default function AddArticle() {
 
       // Redirect after successful creation
       setTimeout(() => {
-        router.push("/dashboard/articles");
+        router.push("/dashboard/workflow/articles");
       }, 1500);
     } catch (error) {
       console.error("Error creating article:", error);
