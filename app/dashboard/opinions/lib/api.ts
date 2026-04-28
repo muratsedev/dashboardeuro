@@ -1,8 +1,14 @@
 import { getApiUrl } from '../../../../lib/api-config';
+import { getToken } from '../../../../lib/auth';
 import { Opinion, OpinionCreate } from '../types/Opinion';
 
 const BASE_API_URL = getApiUrl();
 const API_URL = `${BASE_API_URL}/api/Opinions`;
+
+function authHeaders(): HeadersInit {
+  const token = getToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
 
 export async function getOpinions(): Promise<Opinion[]> {
   const res = await fetch(API_URL, { cache: 'no-store' });
@@ -27,7 +33,7 @@ export async function createOpinion(data: OpinionCreate, image?: File): Promise<
   if (data.createdDate) formData.append('createdDate', data.createdDate);
   if (image) formData.append('image', image, image.name);
 
-  const res = await fetch(API_URL, { method: 'POST', body: formData });
+  const res = await fetch(API_URL, { method: 'POST', body: formData, headers: authHeaders() });
   if (!res.ok) throw new Error('فشل في إنشاء المقال');
   return res.json();
 }
@@ -43,12 +49,12 @@ export async function updateOpinion(id: string, data: OpinionCreate, image?: Fil
   if (data.updatedDate) formData.append('updatedDate', data.updatedDate);
   if (image) formData.append('image', image, image.name);
 
-  const res = await fetch(`${API_URL}/${id}`, { method: 'PUT', body: formData });
+  const res = await fetch(`${API_URL}/${id}`, { method: 'PUT', body: formData, headers: authHeaders() });
   if (!res.ok) throw new Error('فشل في تحديث المقال');
 }
 
 export async function deleteOpinion(id: string): Promise<void> {
-  const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+  const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE', headers: authHeaders() });
   if (!res.ok) throw new Error('فشل في حذف المقال');
 }
 

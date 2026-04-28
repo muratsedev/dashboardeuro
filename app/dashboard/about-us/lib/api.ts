@@ -1,5 +1,11 @@
 import { getApiUrl } from '../../../../lib/api-config';
+import { getToken } from '../../../../lib/auth';
 import { AboutUs, CreateAboutUsDto, UpdateAboutUsDto } from '../types/AboutUs';
+
+function authHeaders(): Record<string, string> {
+  const token = getToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
 
 const BASE_API_URL = getApiUrl();
 const API_URL = `${BASE_API_URL}/api/AboutUs`;
@@ -36,6 +42,7 @@ export const createAboutUs = async (data: CreateAboutUsDto): Promise<AboutUs> =>
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...authHeaders(),
       },
       body: JSON.stringify(data),
     });
@@ -58,6 +65,7 @@ export const updateAboutUs = async (id: number, data: UpdateAboutUsDto): Promise
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        ...authHeaders(),
       },
       body: JSON.stringify(data),
     });
@@ -76,6 +84,7 @@ export const deleteAboutUs = async (id: number): Promise<void> => {
   try {
     const response = await fetch(`${API_URL}/${id}`, {
       method: 'DELETE',
+      headers: authHeaders(),
     });
 
     if (!response.ok) {

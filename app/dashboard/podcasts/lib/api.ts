@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { Podcast, CreatePodcastDto, UpdatePodcastDto } from '../types/Podcast';
 import { getApiUrl } from '../../../../lib/api-config';
+import { getToken } from '../../../../lib/auth';
 
 const BASE_API_URL = getApiUrl();
 const API_URL = `${BASE_API_URL}/api/Podcasts`;
@@ -13,6 +14,13 @@ const api = axios.create({
     'Content-Type': 'application/json'
   },
   withCredentials: false
+});
+
+// Add auth token to every request
+api.interceptors.request.use((config) => {
+  const token = getToken();
+  if (token) config.headers['Authorization'] = `Bearer ${token}`;
+  return config;
 });
 
 // Add response interceptor for better error handling

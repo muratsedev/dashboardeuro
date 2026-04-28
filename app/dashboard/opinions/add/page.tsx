@@ -217,25 +217,38 @@ export default function AddOpinionPage() {
           </div>
 
           {/* Published */}
-          <div className="flex items-center gap-3">
-            <label className="text-sm font-medium text-gray-700">نشر المقال</label>
-            <button
-              type="button"
-              onClick={() => setIsPublished(!isPublished)}
-              aria-label={isPublished ? "إلغاء النشر" : "نشر المقال"}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-                isPublished ? "bg-indigo-600" : "bg-gray-200"
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
-                  isPublished ? "translate-x-6" : "translate-x-1"
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">حالة المقال</label>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setIsPublished(true)}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
+                  isPublished
+                    ? "border-green-500 bg-green-50 text-green-700"
+                    : "border-gray-200 bg-white text-gray-500 hover:border-gray-300"
                 }`}
-              />
-            </button>
-            <span className="text-sm text-gray-500">
-              {isPublished ? "منشور" : "مسودة"}
-            </span>
+              >
+                <span className={`inline-block w-2.5 h-2.5 rounded-full ${
+                  isPublished ? "bg-green-500" : "bg-gray-300"
+                }`} />
+                <span className="text-sm font-medium">منشور</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsPublished(false)}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
+                  !isPublished
+                    ? "border-yellow-400 bg-yellow-50 text-yellow-700"
+                    : "border-gray-200 bg-white text-gray-500 hover:border-gray-300"
+                }`}
+              >
+                <span className={`inline-block w-2.5 h-2.5 rounded-full ${
+                  !isPublished ? "bg-yellow-400" : "bg-gray-300"
+                }`} />
+                <span className="text-sm font-medium">مسودة</span>
+              </button>
+            </div>
           </div>
 
           {/* Actions */}

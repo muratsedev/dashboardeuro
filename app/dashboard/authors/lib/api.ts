@@ -1,5 +1,11 @@
 import { getApiUrl } from '../../../../lib/api-config';
+import { getToken } from '../../../../lib/auth';
 import { Author, CreateAuthorDto, UpdateAuthorDto } from '../types/Author';
+
+function authHeaders(): Record<string, string> {
+  const token = getToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
 
 const BASE_API_URL = getApiUrl();
 
@@ -23,6 +29,7 @@ export async function createAuthor(data: CreateAuthorDto): Promise<Author> {
 
   const res = await fetch(`${BASE_API_URL}/api/Authors`, {
     method: 'POST',
+    headers: authHeaders(),
     body: formData,
   });
   if (!res.ok) throw new Error('فشل في إنشاء الكاتب');
@@ -37,6 +44,7 @@ export async function updateAuthor(id: number, data: UpdateAuthorDto): Promise<A
 
   const res = await fetch(`${BASE_API_URL}/api/Authors/${id}`, {
     method: 'PUT',
+    headers: authHeaders(),
     body: formData,
   });
   if (!res.ok) throw new Error('فشل في تحديث الكاتب');
@@ -44,6 +52,6 @@ export async function updateAuthor(id: number, data: UpdateAuthorDto): Promise<A
 }
 
 export async function deleteAuthor(id: number): Promise<void> {
-  const res = await fetch(`${BASE_API_URL}/api/Authors/${id}`, { method: 'DELETE' });
+  const res = await fetch(`${BASE_API_URL}/api/Authors/${id}`, { method: 'DELETE', headers: authHeaders() });
   if (!res.ok) throw new Error('فشل في حذف الكاتب');
 }

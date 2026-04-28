@@ -1,5 +1,11 @@
 import { getApiUrl } from '../../../../lib/api-config';
+import { getToken } from '../../../../lib/auth';
 import { PrivacyPolicy, CreatePrivacyPolicyDto } from '../types/PrivacyPolicy';
+
+function authHeaders(): Record<string, string> {
+  const token = getToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
 
 const BASE_API_URL = getApiUrl();
 const API_URL = `${BASE_API_URL}/api/PrivacyPolicies`;
@@ -36,6 +42,7 @@ export const createPrivacyPolicy = async (data: CreatePrivacyPolicyDto): Promise
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...authHeaders(),
       },
       body: JSON.stringify(data),
     });
@@ -58,6 +65,7 @@ export const updatePrivacyPolicy = async (id: number, data: CreatePrivacyPolicyD
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        ...authHeaders(),
       },
       body: JSON.stringify({
         id,
@@ -87,6 +95,7 @@ export const deletePrivacyPolicy = async (id: number): Promise<void> => {
   try {
     const response = await fetch(`${API_URL}/${id}`, {
       method: 'DELETE',
+      headers: authHeaders(),
     });
 
     if (!response.ok) {
