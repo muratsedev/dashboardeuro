@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Toaster } from 'react-hot-toast';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
+import { getToken, clearAuth } from '@/lib/auth';
 
 // Force dynamic rendering for all dashboard routes
 export const dynamic = 'force-dynamic'
@@ -19,9 +20,11 @@ export default function DashboardLayout({
   const router = useRouter();
 
   useEffect(() => {
-    // Check if user is logged in
+    // Require both the legacy flag AND a JWT token
     const isLoggedIn = localStorage.getItem('isLoggedIn');
-    if (!isLoggedIn) {
+    const token = getToken();
+    if (!isLoggedIn || !token) {
+      clearAuth();
       router.push('/');
     } else {
       setIsLoading(false);

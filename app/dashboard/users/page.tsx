@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { getApiEndpoint } from '@/lib/api-config';
-import { getToken, hasRole, Roles } from '@/lib/auth';
+import { getToken, hasRole, Roles, handleUnauthorized } from '@/lib/auth';
 
 const SUPERUSER_EMAIL = 'superuser@euronews.com';
 
@@ -37,6 +37,7 @@ export default function Users() {
       const res = await fetch(getApiEndpoint('/api/Users'), {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
+      if (res.status === 401) { handleUnauthorized(); return; }
       if (!res.ok) throw new Error('فشل في جلب المستخدمين');
       setUsers(await res.json());
     } catch (err) {
@@ -54,6 +55,7 @@ export default function Users() {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${getToken()}` },
       });
+      if (res.status === 401) { handleUnauthorized(); return; }
       if (!res.ok) throw new Error('فشل في تحديث المستخدم');
       toast.success('تم تعطيل المستخدم');
       setUsers(prev => prev.map(u => u.id === id ? { ...u, isActive: false } : u));

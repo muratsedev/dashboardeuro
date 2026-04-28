@@ -39,6 +39,14 @@ export function clearAuth() {
   localStorage.removeItem('isLoggedIn');
 }
 
+/** Call this whenever an API responds with 401 — clears auth and redirects to login. */
+export function handleUnauthorized() {
+  clearAuth();
+  if (typeof window !== 'undefined') {
+    window.location.href = '/';
+  }
+}
+
 export function isAuthenticated(): boolean {
   return Boolean(getToken());
 }
