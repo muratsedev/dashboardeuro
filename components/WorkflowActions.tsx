@@ -50,6 +50,7 @@ export default function WorkflowActions({ contentType, id, currentStatus, onStat
   const isEditor = hasRole(Roles.Editor, Roles.Admin);
   const isProofReader = hasRole(Roles.ProofReader, Roles.Admin);
   const isPublisher = hasRole(Roles.Publisher, Roles.Admin);
+  const isAdmin = hasRole(Roles.Admin);
 
   return (
     <div className="mt-4 border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-slate-800" dir="rtl">
@@ -129,6 +130,17 @@ export default function WorkflowActions({ contentType, id, currentStatus, onStat
               مسودة
             </button>
           </>
+        )}
+
+        {/* Force Publish — Admin only, bypasses sequential workflow */}
+        {isAdmin && currentStatus !== 4 && (
+          <button
+            onClick={() => callAction('force-publish')}
+            disabled={loading}
+            className="px-3 py-1.5 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded disabled:opacity-60"
+          >
+            نشر مباشر
+          </button>
         )}
       </div>
     </div>
