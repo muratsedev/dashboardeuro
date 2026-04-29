@@ -64,7 +64,7 @@ export default function Dashboard() {
           ).length;
 
           const editorChoiceArticles = articles.filter((article: any) => 
-            article.isEditorChoice === true
+            article.editorChoice === true
           ).length;
 
           setStats({

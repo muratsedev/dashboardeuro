@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast, Toaster } from "react-hot-toast";
 import {
   PlusIcon,
@@ -27,6 +27,9 @@ export default function Articles() {
   const articlesPerPage = 20;
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const filterParam = searchParams.get('filter');
+  const isEditorChoiceFilter = filterParam === 'editorChoice';
 
   const fetchArticles = async () => {
     try {
@@ -88,10 +91,12 @@ export default function Articles() {
     });
   };
 
-  // Get current articles for pagination (with search filter)
-  const sortedArticles = getSortedArticles().filter((a) =>
-    !searchQuery || a.articleTitle.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Get current articles for pagination (with search filter and optional editorChoice filter)
+  const sortedArticles = getSortedArticles().filter((a) => {
+    if (isEditorChoiceFilter && !a.editorChoice) return false;
+    if (searchQuery && !a.articleTitle.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    return true;
+  });
   const totalPages = Math.ceil(sortedArticles.length / articlesPerPage);
   const indexOfLastArticle = currentPage * articlesPerPage;
   const indexOfFirstArticle = indexOfLastArticle - articlesPerPage;
@@ -278,7 +283,9 @@ export default function Articles() {
           إضافة خبر جديد
         </Link>
 
-        <h1 className="text-2xl font-semibold text-gray-800">الأخبار</h1>
+        <h1 className="text-2xl font-semibold text-gray-800">
+          {isEditorChoiceFilter ? 'اختيار المحرر' : 'الأخبار'}
+        </h1>
       </div>
 
       {/* Search */}
@@ -299,6 +306,13 @@ export default function Articles() {
           description="ابدأ بإنشاء مقالك الأول"
           actionLabel="إضافة مقال جديد"
           actionHref="/dashboard/articles/add"
+        />
+      ) : isEditorChoiceFilter && sortedArticles.length === 0 ? (
+        <EmptyState
+          title="لا توجد مقالات باختيار المحرر"
+          description="يمكنك تعيين مقالات كاختيار المحرر من صفحة تعديل المقال"
+          actionLabel="عرض جميع المقالات"
+          actionHref="/dashboard/articles"
         />
       ) : (
         <div className="bg-white shadow-md rounded-lg overflow-hidden">
