@@ -170,18 +170,7 @@ export default function OpinionsPage() {
                     {opinion.tagName ?? "—"}
                   </td>
                   <td className="px-4 py-3">
-                    <span
-                      className={`inline-flex px-2 py-0.5 text-xs rounded-full font-medium ${
-                        opinion.isPublished
-                          ? "bg-green-100 text-green-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {opinion.isPublished ? "منشور" : "مسودة"}
-                    </span>
-                    <div className="mt-1">
-                      <WorkflowBadge status={(opinion.workflowStatus ?? 0) as WorkflowStatus} />
-                    </div>
+                    <WorkflowBadge status={(opinion.workflowStatus ?? 0) as WorkflowStatus} />
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-500">
                     {opinion.createdDate
