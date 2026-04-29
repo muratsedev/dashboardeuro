@@ -263,7 +263,7 @@ export default function EditOpinionPage({
             <div className="flex gap-3">
               <button
                 type="button"
-                onClick={() => setIsPublished(true)}
+                onClick={() => { setIsPublished(true); setWorkflowStatus(4); }}
                 className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
                   isPublished
                     ? "border-green-500 bg-green-50 text-green-700"
@@ -277,7 +277,7 @@ export default function EditOpinionPage({
               </button>
               <button
                 type="button"
-                onClick={() => setIsPublished(false)}
+                onClick={() => { setIsPublished(false); setWorkflowStatus(0); }}
                 className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
                   !isPublished
                     ? "border-yellow-400 bg-yellow-50 text-yellow-700"

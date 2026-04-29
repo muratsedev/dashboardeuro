@@ -50,7 +50,16 @@ export async function updateOpinion(id: string, data: OpinionCreate, image?: Fil
   if (image) formData.append('image', image, image.name);
 
   const res = await fetch(`${API_URL}/${id}`, { method: 'PUT', body: formData, headers: authHeaders() });
-  if (!res.ok) throw new Error('فشل في تحديث المقال');
+  if (!res.ok) {
+    const errorText = await res.text().catch(() => '');
+    let message = 'فشل في تحديث المقال';
+    try {
+      const errData = JSON.parse(errorText);
+      if (errData.message) message = errData.message;
+      else if (errData.title) message = errData.title;
+    } catch {}
+    throw new Error(message);
+  }
 }
 
 export async function deleteOpinion(id: string): Promise<void> {
