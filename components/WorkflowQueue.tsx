@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, Fragment } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
@@ -20,6 +20,8 @@ interface QueueItem {
   workflowNote?: string;
   updatedAt?: string;
   createdAt?: string;
+  categoryName?: string;
+  editorChoice?: boolean;
 }
 
 const STATUS_FILTERS: { label: string; value: number | null }[] = [
@@ -207,65 +209,103 @@ export default function WorkflowQueue({ contentType }: WorkflowQueueProps) {
         <div className="text-center py-12 text-gray-400 dark:text-gray-500">لا توجد عناصر</div>
       )}
 
-      <div className="space-y-3">
-        {filteredItems.map((item) => (
-          <div
-            key={item.id}
-            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden"
-          >
-            <div className="flex items-center justify-between px-4 py-3 gap-3">
-              <div className="flex items-center gap-3 min-w-0 flex-1">
-                <WorkflowBadge status={item.workflowStatus} />
-                <span className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                  {item.title}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
-                {item.createdAt && (
-                  <span className="hidden sm:inline text-xs text-gray-400">
-                    {new Date(item.createdAt).toLocaleDateString('ar-SA')}
-                  </span>
-                )}
-                <Link
-                  href={EDIT_LINKS[contentType](item.id)}
-                  className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 rounded"
-                >
-                  تعديل
-                </Link>
-                <button
-                  onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
-                  className="px-2 py-1 text-xs bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded"
-                >
-                  {expandedId === item.id ? 'إخفاء' : 'الإجراءات'}
-                </button>
-                <button
-                  onClick={() => handleDelete(item)}
-                  disabled={deletingId === item.id}
-                  className="p-1 text-red-500 hover:text-red-700 dark:hover:text-red-400 disabled:opacity-40"
-                  title="حذف"
-                >
-                  <TrashIcon className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-
-            {expandedId === item.id && (
-              <div className="border-t border-gray-200 dark:border-gray-700 px-4 pb-4">
-                {item.workflowNote && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 mb-1">
-                    ملاحظة: {item.workflowNote}
-                  </p>
-                )}
-                <WorkflowActions
-                  contentType={contentType}
-                  id={item.type === 'articles' || item.type === 'opinions' ? item.id : Number(item.id)}
-                  currentStatus={item.workflowStatus}
-                  onStatusChange={(s) => handleStatusChange(item.id, s)}
-                />
-              </div>
-            )}
-          </div>
-        ))}
+      <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  العنوان ↓
+                </th>
+                <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  التصنيف
+                </th>
+                <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  الحالة
+                </th>
+                <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  اختيار المحرر
+                </th>
+                <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  تاريخ الإنشاء ↓
+                </th>
+                <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  الإجراءات
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+              {filteredItems.map((item) => (
+                <Fragment key={item.id}>
+                  <tr className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                    <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white max-w-xs">
+                      <span className="line-clamp-2">{item.title}</span>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
+                      {item.categoryName || '—'}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <WorkflowBadge status={item.workflowStatus} />
+                    </td>
+                    <td className="px-4 py-3 text-sm text-center whitespace-nowrap">
+                      {item.editorChoice ? (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300">
+                          ✓ نعم
+                        </span>
+                      ) : (
+                        <span className="text-gray-400 dark:text-gray-500">—</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                      {item.createdAt ? new Date(item.createdAt).toLocaleDateString('ar-SA') : '—'}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={EDIT_LINKS[contentType](item.id)}
+                          className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 rounded"
+                        >
+                          تعديل
+                        </Link>
+                        <button
+                          onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
+                          className="px-2 py-1 text-xs bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded"
+                        >
+                          {expandedId === item.id ? 'إخفاء' : 'الإجراءات'}
+                        </button>
+                        <button
+                          onClick={() => handleDelete(item)}
+                          disabled={deletingId === item.id}
+                          className="p-1 text-red-500 hover:text-red-700 dark:hover:text-red-400 disabled:opacity-40"
+                          title="حذف"
+                        >
+                          <TrashIcon className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  {expandedId === item.id && (
+                    <tr className="bg-gray-50 dark:bg-gray-700/30">
+                      <td colSpan={6} className="px-4 pb-4 pt-2">
+                        {item.workflowNote && (
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                            ملاحظة: {item.workflowNote}
+                          </p>
+                        )}
+                        <WorkflowActions
+                          contentType={contentType}
+                          id={item.type === 'articles' || item.type === 'opinions' ? item.id : Number(item.id)}
+                          currentStatus={item.workflowStatus}
+                          onStatusChange={(s) => handleStatusChange(item.id, s)}
+                        />
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
