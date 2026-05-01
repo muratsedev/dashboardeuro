@@ -17,7 +17,7 @@ export default function WorkflowActions({ contentType, id, currentStatus, onStat
   const [note, setNote] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const callAction = async (action: 'submit' | 'approve' | 'reject' | 'publish' | 'unpublish' | 'draft') => {
+  const callAction = async (action: 'submit' | 'approve' | 'reject' | 'publish' | 'unpublish' | 'draft' | 'force-publish') => {
     setLoading(true);
     try {
       const token = getToken();

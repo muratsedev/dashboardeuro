@@ -28,7 +28,7 @@ export default function Articles() {
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  const filterParam = searchParams.get('filter');
+  const filterParam = searchParams?.get('filter');
   const isEditorChoiceFilter = filterParam === 'editorChoice';
 
   const fetchArticles = async () => {
